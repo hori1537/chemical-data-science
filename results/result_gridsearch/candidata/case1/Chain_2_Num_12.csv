@@ -1,0 +1,13 @@
+,smiles,GWP,name
+0,C(C(F)(F)F)(F)F,,
+1,C(C(F)(F)F)(Cl)Cl,,
+2,C(C(F)(F)F)(Cl)F,,
+3,C(C(Cl)(Cl)Cl)(F)F,,
+4,C(C(Cl)(Cl)Cl)(Cl)Cl,,
+5,C(C(Cl)(Cl)Cl)(Cl)F,,
+6,C(C(F)(F)Cl)(F)F,,
+7,C(C(F)(F)Cl)(Cl)Cl,,
+8,C(C(F)(F)Cl)(Cl)F,,
+9,C(C(F)(Cl)Cl)(F)F,,
+10,C(C(F)(Cl)Cl)(Cl)Cl,,
+11,C(C(F)(Cl)Cl)(Cl)F,,
