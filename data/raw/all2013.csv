@@ -1,0 +1,218 @@
+,Name,smiles,Lifetime (yr),RE (W m-2 ppb-1),GWP 20-yr,GWP 100-yr,GWP 500-yr,GTP 20-yr,GTP 50-yr,GTP 100-yr
+0,Trichlorofluoromethane,C(F)(Cl)(Cl)Cl,45,0.26,6898,4663,1491,6889,4888,2335
+1,Dichlorodifluoromethane,C(F)(F)(Cl)Cl,100,0.318,10794,10239,4587,11266,10952,8448
+2,Chlorotrifluoromethane,C(F)(F)(F)Cl,640,0.255,10863,13893,14846,11683,14218,15923
+3,"1,1,2-Trichloro-1,2,2-trifluoroethane",C(C(F)(Cl)Cl)(F)(F)Cl,85,0.302,6490,5824,2394,6731,6247,4474
+4,"1,2-Dichloro-1,1,2,2-tetrafluoroethane",C(C(F)(F)Cl)(F)(F)Cl,190,0.307,7712,8592,5555,8186,9022,8553
+5,"1-Chloro-1,1,2,2,2-pentafluoroethane",C(C(F)(F)Cl)(F)(F)F,1020,0.202,5859,7665,9068,6314,7806,8977
+6,Dichlorofluoromethane,C(F)(Cl)Cl,1.7,0.145,543,148,42,192,26,20
+7,Chlorodifluoromethane,C(F)(F)Cl,11.9,0.208,5280,1765,503,4196,832,262
+8,"1,1,2-Trichloro-2,2-difluoroethane",C(C(F)(F)Cl)(Cl)Cl,0.97,0.168,218,59,17,70,10,8
+9,"1,1,2-Trichloro-1,2-difluoroethane",C(C(F)(Cl)Cl)(F)Cl,3.4,0.209,945,258,74,426,48,36
+10,"2,2-Dichloro-1,1,1-trifluoroethane",C(C(F)(F)F)(Cl)Cl,1.3,0.152,292,79,23,98,14,11
+11,"1,2-Dichloro-1,1,2-trifluoroethane",C(C(F)(F)Cl)(F)Cl,4,0.23,1350,370,105,659,72,51
+12,"2-Chloro-1,1,1,2-tetrafluoroethane",C(C(F)(F)F)(F)Cl,5.9,0.198,1870,527,150,1116,121,74
+13,"1,1-Dichloro-1,2-difluoroethane",C(C(F)(Cl)Cl)F,4.3,0.173,1232,338,96,624,67,47
+14,"1,1-Dichloro-1-fluoroethane",CC(F)(Cl)Cl,9.2,0.162,2548,782,223,1853,271,111
+15,"1-Chloro-1,1-difluoroethane",CC(F)(F)Cl,17.2,0.189,5024,1982,567,4393,1372,356
+16,"3,3-Dichloro-1,1,1,2,2-pentafluoropropane",C(C(C(F)(F)F)(F)F)(Cl)Cl,1.9,0.221,469,127,36,170,22,18
+17,"1,3-Dichloro-1,1,2,2,3-pentafluoropropane",C(C(C(F)(F)Cl)(F)F)(F)Cl,5.9,0.293,1864,525,150,1112,120,73
+18,"(E)-1-Chloro-3,3,3-trifluoroprop-1-ene",C(=C/Cl)\C(F)(F)F,0.0712,0.044,5,1,0,2,0,0
+19,Trifluoromethane,C(F)(F)F,222,0.175,10827,12398,8721,11524,12960,12709
+20,Difluoromethane,C(F)F,5.2,0.11,2435,677,193,1362,145,94
+21,Fluoromethane,CF,2.8,0.023,427,116,33,177,21,16
+22,"1,1,1,2,2-Pentafluoroethane",C(C(F)(F)F)(F)F,28.2,0.226,6094,3169,930,5797,2977,967
+23,"1,1,2,2-Tetrafluoroethane",C(C(F)F)(F)F,9.7,0.191,3580,1116,318,2656,412,160
+24,"1,1,1,2-Tetrafluoroethane",C(C(F)(F)F)F,13.4,0.161,3710,1301,371,3053,703,201
+25,"1,1,2-Trifluoroethane",C(C(F)F)F,3.5,0.128,1202,328,94,549,62,46
+26,"1,1,1-Trifluoroethane",CC(F)(F)F,47.1,0.158,6941,4804,1556,6957,5061,2505
+27,"1,2-Difluoroethane",C(CF)F,0.4,0.044,60,16,5,18,3,2
+28,"1,1-Difluoroethane",CC(F)F,1.5,0.098,506,138,39,174,24,19
+29,Fluoroethane,CCF,0.1808,0.016,13,4,1,4,1,1
+30,"1,1,1,2,2,3,3-Heptafluoropropane",C(C(C(F)(F)F)(F)F)(F)F,28.2,0.267,5080,2642,776,4833,2482,806
+31,"1,1,1,2,3,3,3-Heptafluoropropane",C(C(F)(F)F)(C(F)(F)F)F,38.9,0.258,5358,3348,1034,5283,3436,1460
+32,"1,1,1,2,2,3-Hexafluoropropane",C(C(C(F)(F)F)(F)F)F,13.1,0.228,3476,1207,344,2842,636,185
+33,"1,1,1,2,3,3-Hexafluoropropane",C(C(F)F)(C(F)(F)F)F,11,0.3,4111,1335,381,3187,573,195
+34,"1,1,1,3,3,3-Hexafluoropropane",C(C(F)(F)F)C(F)(F)F,242,0.243,6940,8056,5926,7397,8401,8377
+35,"1,1,2,2,3-Pentafluoropropane",C(C(C(F)F)(F)F)F,6.5,0.24,2510,716,204,1570,176,100
+36,"1,1,1,2,2-Pentafluoropropane",CC(C(F)(F)F)(F)F,47.1,0.243,6678,4622,1497,6693,4869,2409
+37,"1,1,2,3,3-Pentafluoropropane",C(C(F)F)(C(F)F)F,3.2,0.16,863,235,67,378,44,33
+38,"1,1,1,2,3-Pentafluoropropane",C(C(C(F)(F)F)F)F,3.1,0.204,1065,290,83,460,54,40
+39,"1,1,1,3,3-Pentafluoropropane",C(C(F)F)C(F)(F)F,7.7,0.243,2920,858,245,1974,245,121
+40,"1,1,1-Trifluoropropane",CCC(F)(F)F,1.2,0.1,278,76,22,92,13,10
+41,"2,2-Difluoropropane",CC(C)(F)F,2.6,0.072,530,144,41,213,26,20
+42,"1,1,1,2,2,3,3,4,4-Nonafluorobutane",C(C(C(C(F)(F)F)(F)F)(F)F)(F)F,28.4,0.306,4510,2355,692,4294,2218,725
+43,"1,1,1,3,3-Pentafluorobutane",CC(CC(F)(F)F)(F)F,8.7,0.223,2661,804,229,1893,262,114
+44,"1,1,1,2,2,3,4,5,5,5-Decafluoropentane",C(C(C(F)(F)F)F)(C(C(F)(F)F)(F)F)F,16.1,0.42,4315,1647,470,3718,1073,281
+45,"1,1-Difluoroethene",C=C(F)F,0.011,0.004,0,0,0,0,0,0
+46,Fluoroethene,C=CF,0.0058,0.002,0,0,0,0,0,0
+47,"(Z)-1,2,3,3,3-Pentafluoroprop-1-ene",C(=C(/C(F)(F)F)\F)\F,0.0233,0.021,1,0,0,0,0,0
+48,"(E)-1,2,3,3,3-Pentafluoroprop-1-ene",C(=C(C(F)(F)F)F)F,0.0134,0.013,0,0,0,0,0,0
+49,"1,3,3,3-Tetrafluoropropene",,0.0274,0.019,1,0,0,0,0,0
+50,"2,3,3,3-Tetrafluoroprop-1-ene",C=C(C(F)(F)F)F,0.0288,0.023,1,0,0,0,0,0
+51,"(E)-1,3,3,3-Tetrafluoroprop-1-ene",C(=C/F)\C(F)(F)F,0.0449,0.039,4,1,0,1,0,0
+52,"(Z)-1,1,1,4,4,4-Hexafluorobut-2-ene",C(=C/C(F)(F)F)\C(F)(F)F,0.0603,0.074,6,2,0,2,0,0
+53,"3,3,3-Trifluoroprop-1-ene",C=CC(F)(F)F,0.0192,0.012,1,0,0,0,0,0
+54,"3,3,4,4,4-Pentafluorobut-1-ene",C=CC(C(F)(F)F)(F)F,0.0208,0.014,0,0,0,0,0,0
+55,"3,3,4,4,5,5,6,6,6-Nonafluorohex-1-ene",C=CC(C(C(C(F)(F)F)(F)F)(F)F)(F)F,0.0208,0.026,0,0,0,0,0,0
+56,"3,3,4,4,5,5,6,6,7,7,8,8,8-Tridecafluorooct-1-ene",C=CC(C(C(C(C(C(F)(F)F)(F)F)(F)F)(F)F)(F)F)(F)F,0.0208,0.029,0,0,0,0,0,0
+57,"3,3,4,4,5,5,6,6,7,7,8,8,9,9,10,10,10-Heptadecafluorodec-1-ene",C=CC(C(C(C(C(C(C(C(F)(F)F)(F)F)(F)F)(F)F)(F)F)(F)F)(F)F)(F)F,0.0208,0.032,0,0,0,0,0,0
+58,"1,1,1-Trichloroethane",CC(Cl)(Cl)Cl,5,0.069,578,160,46,317,34,22
+59,Perchloromethane,,26,0.17,3484,1728,504,3278,1569,479
+59,Tetrachloromethane,,26,0.17,3484,1728,504,3278,1569,479
+60,Chloromethane,CCl,1,0.01,45,12,3,15,2,2
+61,Dichloromethane,C(Cl)Cl,0.3945,0.031,33,9,3,10,2,1
+62,Trichloromethane,C(Cl)(Cl)Cl,0.4082,0.078,60,16,5,18,3,2
+63,"1,2-Dichloroethane",C(CCl)Cl,0.1781,0.008,3,1,0,1,0,0
+64,Bromomethane,CBr,0.8,0.005,9,2,1,3,0,0
+65,Dibromomethane,C(Br)Br,0.337,0.009,4,1,0,1,0,0
+66,Bromodifluoromethane,C(F)(F)Br,5.2,0.154,1352,376,107,756,80,52
+67,Dibromodifluoromethane,C(F)(F)(Br)Br,2.9,0.272,848,231,66,356,42,32
+68,Bromochlorodifluoromethane,C(F)(F)(Cl)Br,16,0.294,4590,1746,499,3950,1132,297
+69,Bromotrifluoromethane,C(F)(F)(F)Br,65,0.298,7801,6292,2283,7986,6746,4168
+70,"2-Bromo-1,1,1-trifluoroethane",C(C(F)(F)F)Br,3.4,0.135,635,173,49,286,33,24
+71,"2-Bromo-2-chloro-1,1,1-trifluoroethane",C(C(F)(F)F)(Cl)Br,1,0.132,151,41,12,49,7,6
+72,"2-Bromo-1,1,1,2-tetrafluoroethane",C(C(F)(F)F)(F)Br,2.9,0.186,674,184,52,283,34,25
+73,"1,2-Dibromo-1,1,2,2-tetrafluoroethane",C(C(F)(F)Br)(F)(F)Br,20,0.313,3444,1472,423,3104,1148,304
+74,Nitrogen trifluoride,N(F)(F)F,500,0.205,12779,16070,15977,13723,16504,18119
+75,Sulphur hexafluoride,FS(F)(F)(F)(F)F,3200,0.567,17500,23507,31510,18904,23795,28215
+76,Trifluoromethylsulfur pentafluoride,,800,0.592,13479,17449,19676,14512,17810,20232
+77,Sulfuryl fluoride,O=S(=O)(F)F,36,0.201,6841,4095,1245,6695,4137,1647
+78,Perfluoromethane,,50000,0.095,4875,6626,9407,5272,6689,8038
+78,Tetrafluoromethane,,50000,0.095,4875,6626,9407,5272,6689,8038
+79,Perfluoroethane,C(C(F)(F)F)(F)(F)F,10000,0.251,8211,11123,15544,8877,11237,13456
+80,Perfluorocyclopropane,C1(C(C1(F)F)(F)F)(F)F,3000,0.228,6853,9198,12279,7402,9312,11031
+81,Perfluoropropane,C(C(F)(F)F)(C(F)(F)F)(F)F,2600,0.277,6644,8900,11765,7176,9015,10654
+82,Perfluorocyclobutane,C1(C(C(C1(F)F)(F)F)(F)F)(F)F,3200,0.315,7106,9545,12794,7676,9661,11456
+83,Perfluorobutane,C(C(C(F)(F)F)(F)F)(C(F)(F)F)(F)F,2600,0.363,6870,9202,12164,7419,9321,11016
+84,Perfluorocyclopentene,C1(=C(C(C(C1(F)F)(F)F)(F)F)F)F,0.0849,0.076,7,2,1,2,0,0
+85,Perfluoropentane,C(C(C(F)(F)F)(F)F)(C(C(F)(F)F)(F)F)(F)F,4100,0.405,6345,8547,11610,6856,8646,10284
+86,Perfluorohexane,C(C(C(C(F)(F)F)(F)F)(F)F)(C(C(F)(F)F)(F)F)(F)F,3100,0.442,5892,7912,10585,6365,8009,9493
+87,Perfluoroheptane,C(C(C(C(F)(F)F)(F)F)(F)F)(C(C(C(F)(F)F)(F)F)(F)F)(F)F,3000,0.502,5828,7822,10442,6295,7919,9381
+88,Perfluorodecalin,,2000,0.553,5389,7185,9291,5818,7286,8565
+89,cis-Perfluorodecalin,,2000,0.557,5427,7236,9357,5859,7337,8626
+90,Trans-Perfluorodecalin,,2000,0.484,4716,6288,8131,5091,6376,7496
+91,Perfluoroethene,C(=C(F)F)(F)F,0.003,0.002,0,0,0,0,0,0
+92,Perfluoropropene,C(=C(F)F)(C(F)(F)F)F,0.0134,0.013,0,0,0,0,0,0
+93,"Perfluorobuta-1,3-diene",C(=C(F)F)(C(=C(F)F)F)F,0.003,0.003,0,0,0,0,0,0
+94,Perfluorobut-1-ene,,0.0164,0.018,0,0,0,0,0,0
+95,Perfluorobut-2-ene,C(=C(/C(F)(F)F)\F)(\C(F)(F)F)/F,0.0849,0.068,6,2,1,2,0,0
+96,(Difluoromethoxy)trifluoromethane,C(OC(F)(F)F)(F)F,119,0.405,12409,12403,6128,13026,13207,10910
+97,(Difluoromethoxy)difluoromethane,C(OC(F)F)(F)F,24.4,0.445,11636,5564,1613,10846,4898,1431
+98,Trifluoro(methoxy)methane,COC(F)(F)F,4.8,0.177,1894,523,149,1016,108,73
+99,"1,1,1,2-Tetrafluoro-2-(trifluoromethoxy)ethane",C(C(F)(F)F)(OC(F)(F)F)F,51.6,0.442,8903,6452,2149,8983,6849,3627
+100,"2-Chloro-1-(difluoromethoxy)-1,1,2-trifluoroethane",C(C(OC(F)F)(F)F)(F)Cl,4.3,0.407,2123,583,166,1075,116,81
+101,"2-Chloro-2-(difluoromethoxy)-1,1,1-trifluoroethane",C(C(F)(F)F)(OC(F)F)Cl,3.5,0.421,1799,491,140,822,93,68
+102,"1-(Difluoromethoxy)-1,1,2,2-tetrafluoroethane",C(C(OC(F)F)(F)F)(F)F,20.8,0.562,9712,4242,1219,8818,3399,912
+103,"2-(Difluoromethoxy)-1,1,1,2-tetrafluoroethane",C(C(F)(F)F)(OC(F)F)F,10.8,0.453,5554,1792,511,4279,753,260
+104,"1,1,1-Trifluoro-2-(trifluoromethoxy)ethane",C(C(F)(F)F)OC(F)(F)F,7.5,0.357,3348,979,279,2238,273,138
+105,"1,1,1,2,2-Pentafluoro-2-methoxy-ethane",,4.9,0.326,2364,654,186,1282,136,91
+106,"1,1-Difluoro-2-(trifluoromethoxy)ethane",C(C(F)F)OC(F)(F)F,6.6,0.306,2896,828,236,1825,206,116
+107,"2-(Difluoromethoxy)-1,1,1-trifluoroethane",C(C(F)(F)F)OC(F)F,5.5,0.36,2908,812,232,1674,179,114
+108,"2,2,3,3,3-Pentafluoropropan-1-ol",C(C(C(F)(F)F)(F)F)O,0.33,0.139,69,19,5,21,3,3
+109,"1,1,2,2-Tetrafluoro-1-methoxyethane",COC(C(F)F)(F)F,2.5,0.258,1105,301,86,438,54,42
+110,"1,1,1-Trifluoro-2-methoxyethane",COCC(F)(F)F,0.063,0.039,5,1,0,1,0,0
+111,"1,1,2,2-Tetrafluoro-1-(trifluoromethoxy)ethane",C(C(OC(F)(F)F)(F)F)(F)F,0.43,0.127,108,29,8,33,5,4
+112,"3,3,3-Trifluoropropan-1-ol",C(CO)C(F)(F)F,0.033,0.022,1,0,0,0,0,0
+113,"1,1,1,2,2-Pentafluoro-2-(1,1,2,2-tetrafluoroethoxy)ethane",,22.5,0.529,6718,3067,885,6182,2582,718
+114,"2-(Difluoromethoxy)-1,1,1,3,3,3-hexafluoropropane",C(C(F)(F)F)(C(F)(F)F)OC(F)F,21.2,0.442,5938,2621,754,5409,2127,575
+115,"1,1,1,2,2-Pentafluoro-2-(2,2,2-trifluoroethoxy)ethane",C(C(F)(F)F)OC(C(F)(F)F)(F)F,7.5,0.439,3180,929,265,2125,259,131
+116,"1,1,1,3,3,3-Hexafluoro-2-(fluoromethoxy)propane",C(OC(C(F)(F)F)C(F)(F)F)F,2.2,0.32,795,216,62,302,38,30
+117,"1,1,1,2,2,3,3-Heptafluoro-3-methoxypropane",COC(C(C(F)(F)F)(F)F)(F)F,5,0.345,1914,530,151,1049,111,74
+118,"1-(2,2-Difluoroethoxy)-1,1,2,2,2-pentafluoroethane",,6.6,0.421,2987,854,243,1882,212,120
+119,"1,1,2,2-Tetrafluoro-1-(2,2,2-trifluoroethoxy)ethane",C(C(F)(F)F)OC(C(F)F)(F)F,6,0.482,3152,889,254,1896,206,124
+120,"1,1,1,2,3,3,3-Heptafluoro-2-methoxypropane",COC(C(F)(F)F)(C(F)(F)F)F,3.7,0.319,1330,363,104,624,69,51
+121,"1,1,1,2,3,3-Hexafluoro-3-methoxypropane",COC(C(C(F)(F)F)F)(F)F,3.8,0.301,1415,387,110,673,74,54
+122,"1-(2,2-Difluoroethoxy)-1,1,2,2-tetrafluoroethane",,5.7,0.373,2564,719,205,1503,162,101
+123,"3-(Difluoromethoxy)-1,1,2,2-tetrafluoropropane",C(C(C(F)F)(F)F)OC(F)F,3.5,0.377,1635,446,127,747,84,62
+124,"1,1,2,2,3,3-Hexafluoro-1-methoxypropane",COC(C(C(F)F)(F)F)(F)F,3.8,0.322,1510,413,118,718,79,57
+125,"1,1,1,3,3,3-Hexafluoro-2-methoxypropane",COC(C(F)(F)F)C(F)(F)F,0.266,0.151,50,14,4,15,2,2
+126,"1,1,1,2,2-Pentafluoro-3-methoxypropane",COCC(C(F)(F)F)(F)F,0.053,0.047,3,1,0,1,0,0
+127,"1-Ethoxy-1,1,2,2,2-pentafluoroethane",CCOC(C(F)(F)F)(F)F,0.59,0.264,215,58,17,66,10,8
+128,"1-Ethoxy-1,1,2,2-tetrafluoroethane",CCOC(C(F)F)(F)F,5,0.298,2263,627,179,1240,132,88
+129,"4,4,4-Trifluorobutan-1-ol",C(CC(F)(F)F)CO,0.011,0.005,0,0,0,0,0,0
+130,"1,1,1,3,3,3-Hexafluoro-2-(trifluoromethyl)-2-propanol",C(C(F)(F)F)(C(F)(F)F)(C(F)(F)F)O,,0.38,,,,,,
+131,"2,2,3,3,4,4,5,5-Octafluorocyclopentanol",,0.3,0.16,47,13,4,14,2,2
+132,"1-(Difluoromethoxy)-2-((difluoromethoxy)difluoromethoxy)-1,1,2,2-tetrafluoroethane",,13.5,1.018,8006,2817,804,6600,1533,436
+133,"1,1,1,2,2,3,3,4,4-Nonafluoro-4-methoxybutane",COC(C(C(C(F)(F)F)(F)F)(F)F)(F)F,4.7,0.364,1525,421,120,809,86,59
+134,"1-Ethoxy-1,1,2,2,3,3,4,4,4-nonafluorobutane",CCOC(C(C(C(F)(F)F)(F)F)(F)F)(F)F,0.8,0.305,209,57,16,66,10,8
+135,Bis(difluoromethoxy)difluoromethane,C(OC(OC(F)F)(F)F)(F)F,25,0.653,11039,5353,1555,10327,4770,1417
+136,"1,2-Bis(difluoromethoxy)-1,1,2,2-tetrafluoroethane",C(OC(C(OC(F)F)(F)F)(F)F)(F)F,12.9,0.858,8427,2908,830,6859,1505,442
+137,"1,1,1,3,3,3-Hexafluoropropan-2-ol",C(C(F)(F)F)(C(F)(F)F)O,1.9,0.261,668,182,52,243,32,25
+138,"1-(Difluoromethoxy)-2-(2-(difluoromethoxy)-1,1,2,2-tetrafluoroethoxy)-1,1,2,2-tetrafluoroethane",,12.9,1.245,7903,2727,778,6433,1411,415
+139,"1,1,3,3,4,4,6,6,7,7,9,9,10,10,12,12-Hexadecafluoro-2,5,8,11-tetraoxadodecane",C(OC(C(OC(C(OC(C(OC(F)F)(F)F)(F)F)(F)F)(F)F)(F)F)(F)F)(F)F,12.9,1.763,8266,2853,814,6729,1476,434
+140,(Difluoromethoxy)((difluoromethoxy)difluoromethoxy)difluoromethane,,25,0.92,10936,5303,1540,10230,4725,1404
+141,"1,1,3,3,5,5,7,7,8,8,10,10-Dodecafluoro-2,4,6,9-tetraoxadecane",C(OC(C(OC(OC(OC(F)F)(F)F)(F)F)(F)F)(F)F)(F)F,13.5,1.715,11051,3888,1109,9110,2116,602
+142,"1,1,3,3,5,5,7,7,9,9-Decafluoro-2,4,6,8-tetraoxanonane",,25,1.652,15122,7333,2130,14146,6534,1941
+143,"1-Ethoxy-1,1,2,2,3,3,3-heptafluoropropane",CCOC(C(C(F)(F)F)(F)F)(F)F,0.75,0.281,223,61,17,70,10,8
+144,"(2,2,2-Trifluoroethoxy)ethene",C=COCC(F)(F)F,0.01,0.011,0,0,0,0,0,0
+145,"1,1,2,2-Tetrafluoro-1-(fluoromethoxy)ethane",C(OC(C(F)F)(F)F)F,6.2,0.343,3077,871,248,1881,207,122
+146,"2-Ethoxy-3,3,4,4,5-pentafluorotetrahydro-2,5-bis[1,2,2,2-tetrafluoro-1-(trifluoromethyl)ethyl]-furan",,1,0.489,204,56,16,66,10,8
+147,Fluoro(methoxy)methane,COCF,0.2,0.065,46,13,4,14,2,2
+148,Difluoro(methoxy)methane,COC(F)F,1.1,0.174,528,144,41,173,25,20
+149,Fluoro(fluoromethoxy)methane,C(OCF)F,0.9,0.193,479,130,37,153,22,18
+150,Difluoro(fluoromethoxy)methane,C(OC(F)F)F,3.3,0.304,2265,617,176,1006,115,86
+151,Trifluoro(fluoromethoxy)methane,,4.4,0.328,2733,751,214,1401,150,105
+152,"1,1,2,2-Tetrafluoro-1,2-dimethoxyethane",,2,0.292,815,222,63,301,39,31
+153,"1,1,2,2-Tetrafluoro-1-methoxy-2-(1,1,2,2-tetrafluoro-2-methoxyethoxy)ethane",,2,0.564,868,236,67,320,42,33
+154,"3,3,4,4,6,6,7,7,9,9,10,10-Dodecafluoro-2,5,8,11-tetraoxadodecane",COC(C(OC(C(OC(C(OC)(F)F)(F)F)(F)F)(F)F)(F)F)(F)F,2,0.765,812,221,63,299,39,31
+155,Difluorodimethoxymethane,,,0.257,,,,,,
+156,"1,1,1,2,3,3-Hexafluoro-3-(trifluoromethoxy)propane",,40,0.476,7170,4550,1413,7089,4692,2039
+157,"1-(Difluoromethoxy)-1,1,2,3,3,3-hexafluoropropane",C(C(OC(F)F)(F)F)(C(F)(F)F)F,,0.515,,,,,,
+158,"3,3,4,4,5,5,6,6,7,7,7-Undecafluoroheptan-1-ol",C(CO)C(C(C(C(C(F)(F)F)(F)F)(F)F)(F)F)(F)F,0.0548,0.061,2,0,0,0,0,0
+159,"3,3,4,4,5,5,6,6,7,7,8,8,9,9,9-Pentadecafluorononan-1-ol",C(CO)C(C(C(C(C(C(C(F)(F)F)(F)F)(F)F)(F)F)(F)F)(F)F)(F)F,0.0548,0.068,1,0,0,0,0,0
+160,"3,3,4,4,5,5,6,6,7,7,8,8,9,9,10,10,11,11,11-Nonadecafluoroundecan-1-ol",C(CO)C(C(C(C(C(C(C(C(C(F)(F)F)(F)F)(F)F)(F)F)(F)F)(F)F)(F)F)(F)F)(F)F,0.0548,0.051,1,0,0,0,0,0
+161,"2-Chloro-1,1,2-trifluoro-1-methoxyethane",COC(C(F)Cl)(F)F,1.4,0.211,449,122,35,153,21,17
+162,"1-(Difluoro(trifluoromethoxy)methoxy)-1,1,2,3,3,3-hexafluoro-2-(trifluoromethoxy)propane",,800,0.648,7498,9706,10945,8073,9907,11254
+163,"1,1,2-Trifluoro-2-(trifluoromethoxy)ethene",C(=C(F)F)(OC(F)(F)F)F,0.023,0.025,1,0,0,0,0,0
+164,Trifluoromethyl formate,C(=O)OC(F)(F)F,3.5,0.311,2154,588,168,984,111,82
+165,Perfluoroethyl formate,,3.5,0.442,2125,580,165,971,110,81
+166,Perfluoropropyl formate,,2.6,0.503,1382,376,107,555,68,52
+167,Perfluorobutyl formate,C(=O)OC(C(C(C(F)(F)F)(F)F)(F)F)(F)F,3,0.561,1439,392,112,613,72,54
+168,"2,2,2-Trifluoroethyl formate",C(C(F)(F)F)OC=O,0.44,0.158,123,33,10,37,6,5
+169,"3,3,3-Trifluoropropyl formate",,0.3,0.134,64,17,5,19,3,2
+170,"1,2,2,2-Tetrafluoroethyl formate",,3.2,0.349,1724,470,134,755,87,65
+171,"1,1,1,3,3,3-Hexafluoropropan-2-yl formate",,3.2,0.333,1221,333,95,535,62,46
+172,Perfluorobutyl acetate,,0.06,0.125,6,2,0,2,0,0
+173,Perfluoropropyl acetate,,0.06,0.107,6,2,0,2,0,0
+174,Perfluoroethyl acetate,,0.06,0.099,8,2,1,2,0,0
+175,Trifluoromethyl acetate,CC(=O)OC(F)(F)F,0.06,0.072,8,2,1,2,0,0
+176,Methyl carbonofluoridate,,1.8,0.067,350,95,27,126,17,13
+177,Fluoromethyl carbonofluoridate,,,0.195,,,,,,
+178,Difluoromethyl carbonofluoridate,,,0.332,,,,,,
+179,Trifluoromethyl carbonofluoridate,C(=O)(OC(F)(F)F)F,,0.323,,,,,,
+180,Perfluoroethyl carbonofluoridate,,,0.481,,,,,,
+181,"2,2,2-Trifluoroethyl carbonofluoridate",,,0.331,,,,,,
+182,"1,1-Difluoroethyl carbonofluoridate",,0.33,0.169,99,27,8,30,5,4
+183,Perfluoropropyl carbonofluoridate,,,0.53,,,,,,
+184,"Trifluoromethyl 2,2,2-trifluoroacetate",,,0.49,,,,,,
+185,"Perfluoroethyl 2,2,2-trifluoroacetate",,,0.623,,,,,,
+186,"1,1-Difluoroethyl 2,2,2-trifluoroacetate",,0.33,0.27,113,31,9,34,5,4
+187,"1,1,1,3,3,3-Hexafluoropropan-2-yl 2,2,2-trifluoroacetate",C(C(F)(F)F)(C(F)(F)F)OC(=O)C(F)(F)F,,0.494,,,,,,
+188,"Vinyl 2,2,2-trifluoroacetate",C=COC(=O)C(F)(F)F,,0.387,,,,,,
+189,"Ethyl 2,2,2-trifluoroacetate",CCOC(=O)C(F)(F)F,0.06,0.053,5,1,0,1,0,0
+190,"2,2,2-Trifluoroethyl 2,2,2-trifluoroacetate",C(C(F)(F)F)OC(=O)C(F)(F)F,0.15,0.145,25,7,2,7,1,1
+191,"Allyl 2,2,2-trifluoroacetate",C=CCOC(=O)C(F)(F)F,,0.354,,,,,,
+192,"Methyl 2,2,2-trifluoroacetate",COC(=O)C(F)(F)F,0.61,0.179,192,52,15,60,9,7
+193,"Phenyl 2,2,2-trifluoroacetate",C1=CC=C(C=C1)OC(=O)C(F)(F)F,,0.386,,,,,,
+194,Methyl 2-fluoroacetate,COC(=O)CF,,0.084,,,,,,
+195,"Difluoromethyl 2,2-difluoroacetate",,,0.438,,,,,,
+196,"Methyl 2,2-difluoroacetate",COC(=O)C(F)F,0.11,0.053,12,3,1,4,1,0
+197,"Difluoromethyl 2,2,2-trifluoroacetate",,0.3,0.241,99,27,8,30,5,4
+198,"2,2,3,3,4,4,4-Heptafluorobutan-1-ol",C(C(C(C(F)(F)F)(F)F)(F)F)O,0.55,0.2,124,34,10,38,6,5
+199,"1,1,2-Trifluoro-2-(trifluoromethoxy)-ethane",C(C(F)F)(OC(F)(F)F)F,9.834,0.345,3972,1243,354,2961,467,178
+200,"1-Ethoxy-1,1,2,3,3,3-hexafluoropropane",CCOC(C(C(F)(F)F)F)(F)F,0.389,0.191,86,23,7,26,4,3
+201,"1,1,1,2,2,3,3-Heptafluoro-3-(1,2,2,2-tetrafluoroethoxy)-propane",,67,0.581,7939,6487,2384,8141,6959,4379
+202,"2,2,3,3-Tetrafluoro-1-propanol",C(C(C(F)F)(F)F)O,0.25,0.112,48,13,4,14,2,2
+203,"2,2,3,4,4,4-Hexafluoro-1-butanol",C(C(C(C(F)(F)F)F)(F)F)O,0.26,0.194,63,17,5,19,3,2
+204,"2,2,3,3,4,4,4-Heptafluoro-1-butanol",C(C(C(C(F)(F)F)(F)F)(F)F)O,0.33,0.161,60,16,5,18,3,2
+205,"1,1,2,2-Tetrafluoro-3-methoxy-propane",,0.039,0.032,2,1,0,1,0,0
+206,"1,1,1,2,2,4,5,5,5-Nonafluoro-4-(trifluoromethyl)-3-pentanone",C(=O)(C(C(F)(F)F)(C(F)(F)F)F)C(C(F)(F)F)(F)F,0.0192,0.028,0,0,0,0,0,0
+207,"3,3,3-Trifluoro-propanal",,0.0055,0.004,0,0,0,0,0,0
+208,"4,4,4-Trifluorobutanal",C(CC(F)(F)F)C=O,,0.163,,,,,,
+209,2-Fluoroethanol,C(CF)O,0.0558,0.016,3,1,0,1,0,0
+210,"2,2-Difluoroethanol",C(C(F)F)O,0.1096,0.037,11,3,1,3,1,0
+211,"2,2,2-Trifluoroethanol",C(C(F)(F)F)O,0.3205,0.101,73,20,6,22,3,3
+212,"1,1'-Oxybis[2-(difluoromethoxy)-1,1,2,2-tetrafluoroethane",,26,1.15,9910,4916,1432,9323,4462,1363
+213,"1,1,3,3,4,4,6,6,7,7,9,9,10,10,12,12-hexadecafluoro-2,5,8,11-Tetraoxadodecane",C(OC(C(OC(C(OC(C(OC(F)F)(F)F)(F)F)(F)F)(F)F)(F)F)(F)F)(F)F,26,1.429,9053,4491,1308,8517,4077,1245
+214,"1,1,3,3,4,4,6,6,7,7,9,9,10,10,12,12,13,13,15,15-eicosafluoro-2,5,8,11,14-Pentaoxapentadecane",,26,1.461,7318,3630,1058,6885,3295,1007
