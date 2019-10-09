@@ -1,0 +1,12 @@
+tensorflow
+numpy
+pandas
+scikit-learn
+category_encoders
+keras
+h5py
+mordred
+pubchempy
+ipython
+pillow
+matplotlib
