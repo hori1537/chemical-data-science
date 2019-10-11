@@ -1,5 +1,6 @@
 
 
+# CMC do chemical model create
 import os
 import random
 
