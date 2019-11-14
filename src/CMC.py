@@ -68,6 +68,7 @@ from chainer_chemistry.dataset.preprocessors import preprocess_method_dict
 
 from chainer_chemistry.links.scaler.standard_scaler import StandardScaler
 from chainer_chemistry.models import Regressor
+from chainer_chemistry.models import MLP, NFP
 from chainer_chemistry.models.prediction import set_up_predictor
 from chainer_chemistry.training.extensions.auto_print_report import AutoPrintReport
 from chainer.training.extensions import Evaluator
@@ -77,6 +78,11 @@ from chainer_chemistry.models.prediction import GraphConvPredictor  # NOQA
 from chainer_chemistry.utils import run_train
 from chainer_chemistry.utils import save_json
 
+# default setting
+method_name = 'nfp'
+#['nfp', 'ggnn', 'schnet', 'weavenet', 'rsgcn', 'relgcn','relgat', 'mpnn', 'gnnfilm']
+epochs=50
+virtual_libraly_num = 10
 
 current_path = Path.cwd()
 program_path = Path(__file__).parent.resolve()
@@ -159,7 +165,7 @@ def apply_molfromsmiles(smiles_name):
     return mols
 
 def parse_arguments():
-    theme_name = t_theme_name.get()
+    theme_name = t_theme_name.get() + '-' + method_name
     # Lists of supported preprocessing methods/models.
     method_list = ['nfp', 'ggnn', 'schnet', 'weavenet', 'rsgcn', 'relgcn',
                    'relgat', 'mpnn', 'gnnfilm']
@@ -173,7 +179,7 @@ def parse_arguments():
                         help='csv file containing the dataset')
 
     parser.add_argument('--method', '-m', type=str, choices=method_list,
-                        help='method name', default='nfp')
+                        help='method name', default=method_name)
 
     parser.add_argument('--label', '-l', nargs='+',
                         default=t_task.get(),
@@ -227,7 +233,8 @@ def fit_by_chainer_chemistry():
     def main():
         # Parse the arguments.
         args = parse_arguments()
-        theme_name = t_theme_name.get()
+        theme_name = t_theme_name.get() + '-' + method_name
+        print(theme_name)
 
         if args.label:
             labels = args.label
@@ -262,14 +269,25 @@ def fit_by_chainer_chemistry():
         train_data_size = int(len(dataset) * args.train_data_ratio)
         trainset, testset = split_dataset_random(dataset, train_data_size, args.seed)
 
+
+
         # Set up the predictor.
-        predictor = set_up_predictor(
-            args.method, args.unit_num,
-            args.conv_layers, class_num, label_scaler=scaler)
+        if Booleanvar_transfer_learning.get() == False:
+            predictor = set_up_predictor(
+                args.method, args.unit_num,
+                args.conv_layers, class_num, label_scaler=scaler)
+
+        elif Booleanvar_transfer_learning.get() == True:
+            # refer https://github.com/pfnet-research/chainer-chemistry/issues/407
+            with open(parent_path / 'models' / 'Lipophilicity-nfp' / 'chainer' / ('regressor-' + str(args.method) + '.pickle'),  'rb') as f:
+                regressor = cloudpickle.loads(f.read())
+                pre_predictor = regressor.predictor
+                predictor = GraphConvPredictor(pre_predictor.graph_conv, MLP(out_dim=1, hidden_dim=16))
 
         # Set up the regressor.
         device = chainer.get_device(args.device)
         metrics_fun = {'mae': functions.mean_absolute_error, 'rmse': rmse}
+
         regressor = Regressor(predictor, lossfun=functions.mean_squared_error,
                               metrics_fun=metrics_fun, device=device)
 
@@ -294,8 +312,12 @@ def fit_by_chainer_chemistry():
         #model_path = os.path.join(os.getcwd(), args.model_filename)
         print(model_path)
 
-        with open(parent_path / 'models' / theme_name / 'chainer' / 'regressor.pickle', 'wb') as f:
+        with open(parent_path / 'models' / theme_name / 'chainer' / ('regressor-' + str(args.method) + '.pickle'),  'wb') as f:
             cloudpickle.dump(regressor, f)
+
+        with open(parent_path / 'models' / theme_name / 'chainer' / ('predictor-' + str(args.method) + '.pickle'),  'wb') as f:
+            cloudpickle.dump(predictor, f)
+
 
         print('Evaluating...')
         test_iterator = SerialIterator(testset, 16, repeat=False, shuffle=False)
@@ -343,7 +365,7 @@ def predict_by_chainer_chemistry():
     def main():
         # Parse the arguments.
         args = parse_arguments()
-        theme_name = t_theme_name.get()
+        theme_name = t_theme_name.get() + '-' + method_name
 
         if args.label:
             labels = args.label
@@ -373,7 +395,7 @@ def predict_by_chainer_chemistry():
         device = chainer.get_device(args.device)
         model_path = os.path.join(args.out, args.model_foldername, args.model_filename)
 
-        with open(parent_path / 'models' / theme_name / 'chainer' / 'regressor.pickle', 'rb') as f:
+        with open(parent_path / 'models' / theme_name / 'chainer' / ('regressor-' + str(args.method) + '.pickle'), 'rb') as f:
             regressor = cloudpickle.loads(f.read())
 
         # Perform the prediction.
@@ -390,31 +412,34 @@ def predict_by_chainer_chemistry():
         df_pred_virtual = df_virtual
         df_pred_virtual[t_task.get()] = pred_virtual
 
-        print(df_pred_virtual)
+        #print(df_pred_virtual)
         df_pred_virtual =df_pred_virtual.dropna()
         df_pred_virtual.to_csv(parent_path / 'results' /  theme_name / 'chainer' / 'virtual-search' /  'virtual.csv')
 
         png_list = (parent_path / 'results' /  theme_name / 'chainer' / 'virtual-search'  / 'png').glob('*.png')
 
+        #print(len(df_pred_virtual[t_task.get()]))
         for i, png_path in enumerate(png_list):
-            img = Image.open(png_path)
-            draw = ImageDraw.Draw(img)# im上のImageDrawインスタンスを作る
-            draw.text((0,0), t_task.get() + ' : ' + str(round(df_pred_virtual[t_task.get()][i],2)),  (0,0,0))
-            img.save(png_path)
+            if i < len(df_pred_virtual[t_task.get()]):
+                #print('i', i )
+                #print(str(round(df_pred_virtual[t_task.get()][i],2)))
+                img = Image.open(png_path)
+                draw = ImageDraw.Draw(img)# im上のImageDrawインスタンスを作る
+                draw.text((0,0), t_task.get() + ' : ' + str(round(df_pred_virtual[t_task.get()][i],2)),  (0,0,0))
+                img.save(png_path)
 
         save_json(os.path.join(args.out, 'eval_result.json'), eval_result)
     main()
 
 
 def make_virtual_lib():
-    theme_name = t_theme_name.get()
+    theme_name = t_theme_name.get() + '-' + method_name
     df_brics = pd.read_csv(t_csv_filepath.get())
-    print(df_brics)
     df_brics['mols'] = df_brics[t_smiles.get()].map(apply_molfromsmiles)
-    print(df_brics)
+    #print(df_brics)
 
     df_brics = df_brics.dropna()
-    print(df_brics)
+    #print(df_brics)
 
     allfrags = set()
     #Applying the for-loop to pandas df is not good.
@@ -422,41 +447,66 @@ def make_virtual_lib():
         frag=BRICS.BRICSDecompose(mol)
         allfrags.update(frag)
 
-    print(allfrags)
+
+
     print('the number of allfrags', len(allfrags))
-    allcomponents = [Chem.MolFromSmiles(f) for f in allfrags]
+
+    allcomponents = [apply_molfromsmiles(f) for f in allfrags]
+    Nonecomponents = [f for f in allcomponents if f==None or f==""]
+    print('len(Nonecomponents)', len(Nonecomponents))
+    allcomponents = [f for f in allcomponents if f != ""]
+    allcomponents = [f for f in allcomponents if f != None]
+
+    #pprint.pprint(allcomponents)
+
+    for f in allfrags:
+        #print('f: ', f)
+        #print('Mol: ',Chem.MolFromSmiles(f))
+        #print(' ')
+        pass
+
+    #print(allcomponents)
     builder = BRICS.BRICSBuild(allcomponents)
 
-    generated_mols =[]
-    generate_nums = 1000
+    print(builder)
 
-    for i in range(generate_nums):
+    virtual_mols =[]
+
+    successful_cnt = 0
+    error_cnt = 0
+
+    for i in range(virtual_libraly_num):
         try:
             m=next(builder)
             m.UpdatePropertyCache(strict=True)
-            generated_mols.append(m)
+            virtual_mols.append(m)
+            successful_cnt+=1
+
         except StopIteration:
-            print(i, '- stopiteration of next(builder)')
+            #print(i, '- stopiteration of next(builder)')
+            error_cnt +=1
             pass
         except :
             print('error')
+            error_cnt +=1
             pass
 
+    print('The number of error : ', error_cnt)
+    print('The ratio of error : ', error_cnt / virtual_libraly_num)
 
-
-    for i, mol in enumerate(generated_mols):
+    for i, mol in enumerate(virtual_mols):
         Draw.MolToFile(mol, str(parent_path / 'results' /  theme_name / 'chainer' / 'virtual-search'  / 'png' / ('tmp-' + str(i) + '.png')))
 
 
     virtual_list = []
-    for i, mol in enumerate(generated_mols):
+    for i, mol in enumerate(virtual_mols):
         virtual_list.append([i, Chem.MolToSmiles(mol), 0])
 
-    print(virtual_list)
+    #print(virtual_list)
     df_virtual = pd.DataFrame(virtual_list,
                               columns=[t_id.get(), t_smiles.get(), t_task.get()])
 
-    print(df_virtual)
+    #print(df_virtual)
     df_virtual.to_csv(parent_path / 'results' /  theme_name / 'chainer' / 'virtual-search'  / 'virtual.csv')
 
 
@@ -578,7 +628,7 @@ def fit_by_mordred():
     from keras.optimizers import SGD
     import tensorflow as tf
 
-    theme_name = t_theme_name.get()
+    theme_name = t_theme_name.get() + '-' + method_name
     df_mordred = pd.read_csv(t_csv_filepath.get())
 
     df_mordred['mols'] = df_mordred['smiles'].map(apply_molfromsmiles)
@@ -679,7 +729,7 @@ def fit_by_mordred():
 
 
 def fit_data():
-    theme_name = t_theme_name.get()
+    theme_name = t_theme_name.get() + '-' + method_name
     chk_mkdir(theme_name)
 
     train_by_mordred = Booleanvar_mordred.get()
@@ -706,6 +756,9 @@ def fit_data():
         make_virtual_lib()
         predict_by_chainer_chemistry()
         print('finish ' , t_theme_name.get())
+
+        return
+
 
 
 # tkinter
@@ -755,21 +808,25 @@ entry_id = ttk.Entry(frame1, textvariable=t_id, width = 60)
 entry_themename = ttk.Entry(frame1, textvariable=t_theme_name, width = 60)
 
 t_epochs = tkinter.StringVar()
-t_epochs.set(500)
+t_epochs.set(50)
 label_epochs = tkinter.ttk.Label(frame1, text = '学習回数:')
 entry_epochs = ttk.Entry(frame1, textvariable=t_epochs, width = 60)
 
 Booleanvar_mordred = tkinter.BooleanVar()
 Booleanvar_deepchem = tkinter.BooleanVar()
 Booleanvar_chainer_chemistry = tkinter.BooleanVar()
+Booleanvar_transfer_learning = tkinter.BooleanVar()
 
 Booleanvar_mordred.set(False)
 Booleanvar_deepchem.set(False)
 Booleanvar_chainer_chemistry.set(True)
+Booleanvar_transfer_learning.set(True)
 
-Checkbutton_mordred = tkinter.Checkbutton(frame1, text = 'mordred', variable = Booleanvar_mordred)
-Checkbutton_deepchem = tkinter.Checkbutton(frame1, text = 'deepchem', variable = Booleanvar_deepchem)
+#Checkbutton_mordred = tkinter.Checkbutton(frame1, text = 'mordred', variable = Booleanvar_mordred)
+#Checkbutton_deepchem = tkinter.Checkbutton(frame1, text = 'deepchem', variable = Booleanvar_deepchem)
 Checkbutton_chainer_chemistry = tkinter.Checkbutton(frame1, text = 'chainer-chemistry', variable = Booleanvar_chainer_chemistry)
+Checkbutton_transfer_learning = tkinter.Checkbutton(frame1, text = '転移学習', variable = Booleanvar_transfer_learning)
+
 
 button_fit = ttk.Button(frame1, text = '訓練開始', command = fit_data, style = 'my.TButton')
 
@@ -810,9 +867,10 @@ entry_themename.grid(row=7,column=2,sticky=W)
 entry_epochs.grid(row=8,column=2,sticky=W)
 
 
-Checkbutton_mordred.grid(           row=9, column=2,sticky=W)
-Checkbutton_deepchem.grid(          row=9,column=3,sticky=W)
-Checkbutton_chainer_chemistry.grid( row=9,column=4,sticky=W)
+#Checkbutton_mordred.grid(           row=9, column=2,sticky=W)
+#Checkbutton_deepchem.grid(          row=9,column=3,sticky=W)
+Checkbutton_chainer_chemistry.grid( row=9,column=2,sticky=W)
+Checkbutton_transfer_learning.grid( row=9,column=3,sticky=W)
 
 button_fit.grid(row=10,column=1,sticky=W)
 
