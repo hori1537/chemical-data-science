@@ -5,29 +5,26 @@ from __future__ import print_function
 print('import libraries')
 import os
 import random
-import time
-import datetime
 from pathlib import Path
 
 import sys
 from sys import exit
+
 import glob
 import pdb
 
 from argparse import ArgumentParser
-from pathlib import Path
 
 import tkinter
 import tkinter.filedialog
 from tkinter import ttk
 from tkinter import N, E, S, W
-
 from tkinter import font
 
 import csv
 import pandas as pd
 import numpy as np
-import numpy
+import numpy # Necessary
 
 import pprint
 import cloudpickle
@@ -78,28 +75,30 @@ from chainer_chemistry.models.prediction import GraphConvPredictor  # NOQA
 from chainer_chemistry.utils import run_train
 from chainer_chemistry.utils import save_json
 
-# default setting
+print('finich the importing')
+
+
+# refer https://horomary.hatenablog.com/entry/2018/10/21/122025
+# refer https://www.ag.kagawa-u.ac.jp/charlesy/2017/07/27/deepchem%E3%81%AB%E3%82%88%E3%82%8B%E6%BA%B6%E8%A7%A3%E5%BA%A6%E4%BA%88%E6%B8%AC-graph-convolution-%E3%83%8B%E3%83%A5%E3%83%BC%E3%83%A9%E3%83%AB%E3%83%8D%E3%83%83%E3%83%88%E3%83%AF%E3%83%BC%E3%82%AF/
+# refer https://future-chem.com/rdkit-intro/
+
+# default setting of chainer chemistry
 method_name = 'nfp'
 #['nfp', 'ggnn', 'schnet', 'weavenet', 'rsgcn', 'relgcn','relgat', 'mpnn', 'gnnfilm']
 epochs=50
 virtual_libraly_num = 10
 
+# paths
 current_path = Path.cwd()
-program_path = Path(__file__).parent.resolve()
-
-parent_path = program_path.parent.resolve()
-
 data_path           = parent_path / 'data'
 data_processed_path = data_path / 'processed'
-
-# refer https://horomary.hatenablog.com/entry/2018/10/21/122025
-# refer https://www.ag.kagawa-u.ac.jp/charlesy/2017/07/27/deepchem%E3%81%AB%E3%82%88%E3%82%8B%E6%BA%B6%E8%A7%A3%E5%BA%A6%E4%BA%88%E6%B8%AC-graph-convolution-%E3%83%8B%E3%83%A5%E3%83%BC%E3%83%A9%E3%83%AB%E3%83%8D%E3%83%83%E3%83%88%E3%83%AF%E3%83%BC%E3%82%AF/
-# refer https://future-chem.com/rdkit-intro/
-#モジュールの読み込み
-
-program_path = Path(__file__).parent   # x.pyのあるディレクトリ
+program_path = Path(__file__).parent   # x.pyのあるディレクトリ 相対パス
 parent_path = program_path / '../'     # ディレクトリ移動
-parent_path_str = str(parent_path.resolve())
+parent_path_str = str(parent_path.resolve())　#絶対パスに変換してから、文字列に変換　（C\desktop\sssss\aaaaa\） という文字列になる
+
+#program_path = Path(__file__).parent.resolve() # 絶対パス
+#parent_path = program_path.parent.resolve()　# 絶対パス
+
 
 if os.name == 'posix':
     import deepchem as dc
@@ -123,7 +122,6 @@ def chk_mkdir(theme_name):
             parent_path / 'results' / theme_name / 'chainer' / 'search',
             parent_path / 'results' / theme_name / 'chainer' / 'virtual-search' ,
             parent_path / 'results' / theme_name / 'chainer' / 'virtual-search'  / 'png'
-
             ]
 
     for path_name in paths:
@@ -135,7 +133,7 @@ def chk_mkdir(theme_name):
 def get_csv():
     current_dir = os.getcwd()
 
-    csv_file_path = tkinter.filedialog.askopenfilename(initialdir = parent_path_str + '/data/processed',
+    csv_file_path = tkinter.filedialog.askopenfilename(initialdir = data_processed_path,
                                                         title = 'choose the csv',
                                                         filetypes = [('csv file', '*.csv')])
 
@@ -149,15 +147,16 @@ def get_csv():
         reader = csv.reader(f)
         l = [row for row in reader]
 
-        t_id.set(l[0][0])
-        t_task.set(l[0][1])
-        t_smiles.set(l[0][2])
+        t_id.set(l[0][0])       #CSVの１列目がIDや名前
+        t_task.set(l[0][1])     #CSVの２列目が目的関数（水の溶解度等）
+        t_smiles.set(l[0][2])   #CSVの３列目がSMILES表記
 
 def apply_molfromsmiles(smiles_name):
     try:
         mols = Chem.MolFromSmiles(smiles_name)
 
     except:
+        #SMILESからMOLに変換できなかった場合、""を返す
         mols = ""
         print(smiles_name)
         print('Error')
@@ -165,7 +164,9 @@ def apply_molfromsmiles(smiles_name):
     return mols
 
 def parse_arguments():
+    #Chainer-chemistry用のparse
     theme_name = t_theme_name.get() + '-' + method_name
+
     # Lists of supported preprocessing methods/models.
     method_list = ['nfp', 'ggnn', 'schnet', 'weavenet', 'rsgcn', 'relgcn',
                    'relgat', 'mpnn', 'gnnfilm']
@@ -796,12 +797,6 @@ t_smiles = tkinter.StringVar()
 t_id = tkinter.StringVar()
 t_theme_name = tkinter.StringVar()
 
-#t_task.set('n')
-#t_smiles.set('smiles')
-#t_id.set('name')
-#t_theme_name.set(str(datetime.date.today()))
-#t_theme_name.set('test')
-
 entry_task = ttk.Entry(frame1, textvariable=t_task, width = 60)
 entry_smiles = ttk.Entry(frame1, textvariable=t_smiles, width = 60)
 entry_id = ttk.Entry(frame1, textvariable=t_id, width = 60)
@@ -866,7 +861,6 @@ entry_id.grid(row=6,column=2,sticky=W)
 entry_themename.grid(row=7,column=2,sticky=W)
 entry_epochs.grid(row=8,column=2,sticky=W)
 
-
 #Checkbutton_mordred.grid(           row=9, column=2,sticky=W)
 #Checkbutton_deepchem.grid(          row=9,column=3,sticky=W)
 Checkbutton_chainer_chemistry.grid( row=9,column=2,sticky=W)
@@ -905,6 +899,9 @@ canvas.create_image(int(photo_size/2), int(photo_size/2), image=image_score)
 
 
 for child in frame1.winfo_children():
+    child.grid_configure(padx=5, pady=5)
+
+for child in frame2.winfo_children():
     child.grid_configure(padx=5, pady=5)
 
 root.mainloop()
