@@ -90,11 +90,12 @@ virtual_libraly_num = 10
 
 # paths
 current_path = Path.cwd()
-data_path           = parent_path / 'data'
-data_processed_path = data_path / 'processed'
 program_path = Path(__file__).parent   # x.pyのあるディレクトリ 相対パス
 parent_path = program_path / '../'     # ディレクトリ移動
-parent_path_str = str(parent_path.resolve())　#絶対パスに変換してから、文字列に変換　（C\desktop\sssss\aaaaa\） という文字列になる
+parent_path_str = str(parent_path.resolve()) #絶対パスに変換してから、文字列に変換　（C\desktop\sssss\aaaaa\） という文字列になる
+
+data_path           = parent_path / 'data'
+data_processed_path = data_path / 'processed'
 
 #program_path = Path(__file__).parent.resolve() # 絶対パス
 #parent_path = program_path.parent.resolve()　# 絶対パス
@@ -892,11 +893,9 @@ canvas = tkinter.Canvas(frame2, width = 400, height = 400)
 canvas.grid(row=1, column = 1)
 
 global image_score
-
 image_score_open = Image.open(os.path.join('logo', 'sample1.png'))
 image_score = ImageTk.PhotoImage(image_score_open, master=frame1)
 canvas.create_image(int(photo_size/2), int(photo_size/2), image=image_score)
-
 
 for child in frame1.winfo_children():
     child.grid_configure(padx=5, pady=5)
