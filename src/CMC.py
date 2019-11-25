@@ -2,41 +2,30 @@
 from __future__ import print_function
 # CMC:chemical model create
 
-print('import libraries')
+print('importing libraries...')
 import os
+import sys
+
+from csv import reader
 import random
 from pathlib import Path
-
-import sys
-from sys import exit
-
-import glob
-import pdb
-
 from argparse import ArgumentParser
+import pprint
+import glob
 
 import tkinter
-import tkinter.filedialog
+from tkinter.filedialog import askopenfilename
 from tkinter import ttk
 from tkinter import N, E, S, W
 from tkinter import font
 
-import csv
-import pandas as pd
+import pdb
+
 import numpy as np
 import numpy # Necessary
+import pandas as pd
 
-import pprint
 import cloudpickle
-
-import pubchempy as pcp
-from mordred import descriptors, Calculator
-
-from rdkit import rdBase, Chem
-from rdkit.Chem import AllChem, Draw, PandasTools
-from rdkit.Chem import BRICS
-from rdkit.Chem.Draw import IPythonConsole
-from rdkit.Chem.Draw import rdMolDraw2D
 
 #scikit-learn
 import sklearn
@@ -47,9 +36,18 @@ import sascorer # need fpscores.pkl.gz, sascorer.py
 import matplotlib.pyplot as plt
 from PIL import ImageTk, Image, ImageDraw
 
-print('import chainer - wait a minute')
-import chainer
+# chemical
+from rdkit import rdBase, Chem
+from rdkit.Chem import AllChem, Draw, PandasTools
+from rdkit.Chem import BRICS
+from rdkit.Chem.Draw import IPythonConsole
+from rdkit.Chem.Draw import rdMolDraw2D
 
+import pubchempy as pcp
+#from mordred import descriptors, Calculator
+
+print('importing chainer - wait a minute')
+import chainer
 from chainer import functions
 from chainer import optimizers
 from chainer import training
@@ -77,11 +75,12 @@ from chainer_chemistry.utils import save_json
 
 print('finich the importing')
 
-
+################################################################################
 # refer https://horomary.hatenablog.com/entry/2018/10/21/122025
 # refer https://www.ag.kagawa-u.ac.jp/charlesy/2017/07/27/deepchem%E3%81%AB%E3%82%88%E3%82%8B%E6%BA%B6%E8%A7%A3%E5%BA%A6%E4%BA%88%E6%B8%AC-graph-convolution-%E3%83%8B%E3%83%A5%E3%83%BC%E3%83%A9%E3%83%AB%E3%83%8D%E3%83%83%E3%83%88%E3%83%AF%E3%83%BC%E3%82%AF/
 # refer https://future-chem.com/rdkit-intro/
 
+################################################################################
 # default setting of chainer chemistry
 method_name = 'nfp'
 #['nfp', 'ggnn', 'schnet', 'weavenet', 'rsgcn', 'relgcn','relgat', 'mpnn', 'gnnfilm']
@@ -113,30 +112,21 @@ else:
     print('OSの種類を判別できません')
 
 def chk_mkdir(theme_name):
-    paths =[parent_path / 'models',
-            parent_path / 'models' / theme_name,
-            parent_path / 'models' / theme_name / 'chainer',
-            parent_path / 'results',
-            parent_path / 'results' / theme_name,
-            parent_path / 'results' / theme_name / 'chainer' ,
+    paths =[parent_path / 'models'  / theme_name / 'chainer',
             parent_path / 'results' / theme_name / 'chainer' / 'predict',
             parent_path / 'results' / theme_name / 'chainer' / 'search',
-            parent_path / 'results' / theme_name / 'chainer' / 'virtual-search' ,
-            parent_path / 'results' / theme_name / 'chainer' / 'virtual-search'  / 'png'
+            parent_path / 'results' / theme_name / 'chainer' / 'virtual-search'  / 'molecular-structure'
             ]
-
     for path_name in paths:
-        if os.path.exists(path_name) == False:
-            os.mkdir(path_name)
-
+        os.makedirs(path_name, exist_ok=True)
     return
 
 def get_csv():
     current_dir = os.getcwd()
 
-    csv_file_path = tkinter.filedialog.askopenfilename(initialdir = data_processed_path,
-                                                        title = 'choose the csv',
-                                                        filetypes = [('csv file', '*.csv')])
+    csv_file_path = askopenfilename(initialdir = data_processed_path,
+                                    title = 'choose the csv',
+                                    filetypes = [('csv file', '*.csv')])
 
 
     t_csv_filename.set(str(Path(csv_file_path).name))
@@ -145,8 +135,8 @@ def get_csv():
     t_theme_name.set(Path(csv_file_path).parent.name)
 
     with open(t_csv_filepath.get()) as f:
-        reader = csv.reader(f)
-        l = [row for row in reader]
+        reader_ = reader(f)
+        l = [row for row in reader_]
 
         t_id.set(l[0][0])       #CSVの１列目がIDや名前
         t_task.set(l[0][1])     #CSVの２列目が目的関数（水の溶解度等）
@@ -337,9 +327,41 @@ def fit_by_chainer_chemistry():
         pred_test = regressor.predict(testset, converter=extract_inputs)
         pred_test = [i[0] for i in pred_test]
 
-
         y_train = [i[2][0] for i in trainset]
         y_test = [i[2][0] for i in testset]
+
+        from sklearn.metrics import mean_squared_error, mean_absolute_error
+        from sklearn.metrics import r2_score
+
+        train_mse = mean_squared_error(y_train, pred_train)
+        test_mse  = mean_squared_error(y_test, pred_test)
+
+        train_rmse = np.sqrt(train_mse)
+        test_rmse  = np.sqrt(test_mse)
+
+        train_mae = mean_absolute_error(y_train, pred_train)
+        test_mae  = mean_absolute_error(y_test, pred_test)
+
+        train_r2score = r2_score(y_train, pred_train)
+        test_r2score  = r2_score(y_test, pred_test)
+
+
+        print('train_mse')
+        print(train_mse)
+        print('test_mse')
+        print(test_mse)
+        print('train_rmse')
+        print(train_rmse)
+        print('test_rmse')
+        print(test_rmse)
+        print('train_mae')
+        print(train_mae)
+        print('test_mae')
+        print(test_mae)
+        print('train_r2score')
+        print(train_r2score)
+        print('test_r2score')
+        print(test_r2score)
 
 
         from PIL import Image
@@ -418,7 +440,7 @@ def predict_by_chainer_chemistry():
         df_pred_virtual =df_pred_virtual.dropna()
         df_pred_virtual.to_csv(parent_path / 'results' /  theme_name / 'chainer' / 'virtual-search' /  'virtual.csv')
 
-        png_list = (parent_path / 'results' /  theme_name / 'chainer' / 'virtual-search'  / 'png').glob('*.png')
+        png_list = (parent_path / 'results' /  theme_name / 'chainer' / 'virtual-search'  / 'molecular-structure').glob('*.png')
 
         #print(len(df_pred_virtual[t_task.get()]))
         for i, png_path in enumerate(png_list):
@@ -497,7 +519,7 @@ def make_virtual_lib():
     print('The ratio of error : ', error_cnt / virtual_libraly_num)
 
     for i, mol in enumerate(virtual_mols):
-        Draw.MolToFile(mol, str(parent_path / 'results' /  theme_name / 'chainer' / 'virtual-search'  / 'png' / ('tmp-' + str(i) + '.png')))
+        Draw.MolToFile(mol, str(parent_path / 'results' /  theme_name / 'chainer' / 'virtual-search'  / 'molecular-structure' / ('tmp-' + str(i) + '.png')))
 
 
     virtual_list = []
@@ -765,7 +787,7 @@ def fit_data():
 
 # tkinter
 root = tkinter.Tk()
-root.title('test-horie')
+root.title('Chemical Data Science')
 
 #font and style
 font1 = font.Font(family='游ゴシック', size=10, weight='bold')
@@ -774,7 +796,6 @@ root.option_add("*Button.font", font1)
 
 style1  = ttk.Style()
 style1.configure('my.TButton', font = ('游ゴシック',10)  )
-
 
 #frame1
 frame1  = tkinter.ttk.Frame(root)
