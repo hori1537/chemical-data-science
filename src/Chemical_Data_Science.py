@@ -1,6 +1,6 @@
 
 from __future__ import print_function
-# CMC:chemical model create
+#© Copyright 2019 Yuki Horie
 
 print('importing libraries...')
 import os
@@ -82,7 +82,7 @@ print('finich the importing')
 
 ################################################################################
 # default setting of chainer chemistry
-method_name = ['nfp']
+training_method = ['nfp', 'weavenet', 'mpnn']
 #['nfp', 'ggnn', 'schnet', 'weavenet', 'rsgcn', 'relgcn','relgat', 'mpnn', 'gnnfilm']
 epochs=50
 virtual_libraly_num = 500
@@ -96,27 +96,13 @@ parent_path_str = str(parent_path.resolve()) #絶対パスに変換してから�
 data_path           = parent_path / 'data'
 data_processed_path = data_path / 'processed'
 
-#program_path = Path(__file__).parent.resolve() # 絶対パス
-#parent_path = program_path.parent.resolve()　# 絶対パス
-
-
-if os.name == 'posix':
-    import deepchem as dc
-    from deepchem.models.tensorgraph.models.graph_models import GraphConvModel
-    print('起動環境はLinuxです')
-
-elif os.name == 'nt':
-    print('起動環境はWindowsです')
-    print('deepchemは利用できません')
-else:
-    print('OSの種類を判別できません')
-
 def chk_mkdir(theme_name):
-    paths =[parent_path / 'models'  / theme_name / 'chainer',
-            parent_path / 'results' / theme_name / 'chainer' / 'predict',
-            parent_path / 'results' / theme_name / 'chainer' / 'search',
-            parent_path / 'results' / theme_name / 'chainer' / 'virtual-search'  / 'molecular-structure'
+    paths =[parent_path / 'results' / theme_name / 'predict',
+            parent_path / 'results' / theme_name / 'search',
+            parent_path / 'results' / theme_name / 'virtual-search'  / 'molecular-structure',
+            parent_path / 'models'  / theme_name
             ]
+
     for path_name in paths:
         os.makedirs(path_name, exist_ok=True)
     return
@@ -138,9 +124,9 @@ def get_csv():
         reader_ = reader(f)
         l = [row for row in reader_]
 
-        t_id.set(l[0][0])       #CSVの１列目がIDや名前
-        t_task.set(l[0][1])     #CSVの２列目が目的関数（水の溶解度等）
-        t_smiles.set(l[0][2])   #CSVの３列目がSMILES表記
+        t_id.set(l[0][0])       #１列目の列名を取得：IDや名前
+        t_task.set(l[0][1])     #２列目の列名を取得：目的関数（例：水の溶解度）
+        t_smiles.set(l[0][2])   #３列目の列名を取得：SMILES表記
 
 def apply_molfromsmiles(smiles_name):
     try:
@@ -150,13 +136,12 @@ def apply_molfromsmiles(smiles_name):
         #SMILESからMOLに変換できなかった場合、""を返す
         mols = ""
         print(smiles_name)
-        print('Error')
+        print('Error : ', smiles_name, ' couldn\'t be converted to MOL, skipped')
 
     return mols
 
 def parse_arguments():
-    #Chainer-chemistry用のparse
-    theme_name = t_theme_name.get() + '-' + method_list
+    #theme_name = t_theme_name.get() + '-' + method_name
 
     # Lists of supported preprocessing methods/models.
     method_list = ['nfp', 'ggnn', 'schnet', 'weavenet', 'rsgcn', 'relgcn',
@@ -170,8 +155,8 @@ def parse_arguments():
                         default='dataset_train.csv',
                         help='csv file containing the dataset')
 
-    parser.add_argument('--method', '-m', type=str, choices=method_list,
-                        help='method name', default=method_name)
+    parser.add_argument('--method', '-m', type=str, choices=method_name,
+                        help='method name', default='nfp')
 
     parser.add_argument('--label', '-l', nargs='+',
                         default=t_task.get(),
@@ -194,7 +179,7 @@ def parse_arguments():
     parser.add_argument('--out', '-o', type=str, default=parent_path / 'models',
                         help='path to save the computed model to')
 
-    parser.add_argument('--epoch', '-e', type=int, default=int(float(t_epochs.get())),
+    parser.add_argument('--epoch', '-e', type=int, default=50,
                         help='number of epochs')
 
     parser.add_argument('--unit-num', '-u', type=int, default=16,
@@ -209,7 +194,7 @@ def parse_arguments():
     parser.add_argument('--protocol', type=int, default=2,
                         help='pickle protocol version')
 
-    parser.add_argument('--model-foldername', type=str, default=os.path.join(theme_name , 'chainer'),
+    parser.add_argument('--model-foldername', type=str, default='chainer',
                         help='saved model foldername')
 
     parser.add_argument('--model-filename', type=str, default='regressor.pkl',
@@ -220,12 +205,17 @@ def parse_arguments():
 def rmse(x0, x1):
     return functions.sqrt(functions.mean_squared_error(x0, x1))
 
-def fit_by_chainer_chemistry():
+def fit_by_chainer_chemistry(method_name):
 
     def main():
         # Parse the arguments.
         args = parse_arguments()
+
         theme_name = t_theme_name.get() + '-' + method_name
+        args.model_folder_name = os.path.join(theme_name , 'chainer')
+        args.epoch = int(float(t_epochs.get()))
+        args.out = parent_path / 'models' / theme_name
+
         print(theme_name)
 
         if args.label:
@@ -242,7 +232,6 @@ def fit_by_chainer_chemistry():
         print('Preprocessing dataset...')
         preprocessor = preprocess_method_dict[args.method]()
         smiles_col_name = t_smiles.get()
-        print('smiles_col_name',  smiles_col_name)
 
         parser = CSVFileParser(preprocessor, postprocess_label=postprocess_label,
                                labels=labels, smiles_col=smiles_col_name)
@@ -261,8 +250,6 @@ def fit_by_chainer_chemistry():
         train_data_size = int(len(dataset) * args.train_data_ratio)
         trainset, testset = split_dataset_random(dataset, train_data_size, args.seed)
 
-
-
         # Set up the predictor.
         if Booleanvar_transfer_learning.get() == False:
             predictor = set_up_predictor(
@@ -271,7 +258,7 @@ def fit_by_chainer_chemistry():
 
         elif Booleanvar_transfer_learning.get() == True:
             # refer https://github.com/pfnet-research/chainer-chemistry/issues/407
-            with open(parent_path / 'models' / 'Lipophilicity-nfp' / 'chainer' / ('regressor-' + str(args.method) + '.pickle'),  'rb') as f:
+            with open(parent_path / 'models' / 'Lipophilicity-nfp' / ('regressor-' + str(args.method) + '.pickle'),  'rb') as f:
                 regressor = cloudpickle.loads(f.read())
                 pre_predictor = regressor.predictor
                 predictor = GraphConvPredictor(pre_predictor.graph_conv, MLP(out_dim=1, hidden_dim=16))
@@ -301,13 +288,11 @@ def fit_by_chainer_chemistry():
         if hasattr(regressor.predictor.graph_conv, 'reset_state'):
             regressor.predictor.graph_conv.reset_state()
 
-        #model_path = os.path.join(os.getcwd(), args.model_filename)
-        print(model_path)
 
-        with open(parent_path / 'models' / theme_name / 'chainer' / ('regressor-' + str(args.method) + '.pickle'),  'wb') as f:
+        with open(parent_path / 'models' / theme_name / ('regressor-' + str(args.method) + '.pickle'),  'wb') as f:
             cloudpickle.dump(regressor, f)
 
-        with open(parent_path / 'models' / theme_name / 'chainer' / ('predictor-' + str(args.method) + '.pickle'),  'wb') as f:
+        with open(parent_path / 'models' / theme_name / ('predictor-' + str(args.method) + '.pickle'),  'wb') as f:
             cloudpickle.dump(predictor, f)
 
 
@@ -374,18 +359,18 @@ def fit_by_chainer_chemistry():
         plt.scatter(y_test, pred_test, c = 'lightgreen', label = 'Test', alpha = 0.8)
         plt.legend(loc = 4)
 
-        plt.savefig(parent_path / 'results' / theme_name / 'chainer' / 'scatter.png')
+        plt.savefig(parent_path / 'results' / theme_name / 'scatter.png')
         #plt.close(p_sct)
 
         global image_score
-        image_score_open = Image.open(parent_path / 'results' / theme_name / 'chainer' / 'scatter.png')
+        image_score_open = Image.open(parent_path / 'results' / theme_name / 'scatter.png')
         image_score = ImageTk.PhotoImage(image_score_open, master=frame1)
 
         canvas.create_image(200,200, image=image_score)
 
     main()
 
-def predict_by_chainer_chemistry():
+def predict_by_chainer_chemistry(method_name):
     def main():
         # Parse the arguments.
         args = parse_arguments()
@@ -405,7 +390,7 @@ def predict_by_chainer_chemistry():
         preprocessor = preprocess_method_dict[args.method]()
         parser = CSVFileParser(preprocessor, postprocess_label=postprocess_label,
                                labels=labels, smiles_col=t_smiles.get())
-        args.datafile=parent_path / 'results' /  theme_name / 'chainer' / 'virtual-search'  / 'virtual.csv'
+        args.datafile=parent_path / 'results' /  theme_name / 'virtual-search'  / 'virtual.csv'
         virtualset = parser.parse(args.datafile)['dataset']
 
         test = virtualset
@@ -419,7 +404,7 @@ def predict_by_chainer_chemistry():
         device = chainer.get_device(args.device)
         model_path = os.path.join(args.out, args.model_foldername, args.model_filename)
 
-        with open(parent_path / 'models' / theme_name / 'chainer' / ('regressor-' + str(args.method) + '.pickle'), 'rb') as f:
+        with open(parent_path / 'models' / theme_name / ('regressor-' + str(args.method) + '.pickle'), 'rb') as f:
             regressor = cloudpickle.loads(f.read())
 
         # Perform the prediction.
@@ -432,15 +417,15 @@ def predict_by_chainer_chemistry():
 
         pred_virtual = regressor.predict(virtualset, converter=extract_inputs)
         pred_virtual = [i[0] for i in pred_virtual]
-        df_virtual = pd.read_csv(parent_path / 'results' /  theme_name / 'chainer' / 'virtual-search'  / 'virtual.csv')
+        df_virtual = pd.read_csv(parent_path / 'results' /  theme_name / 'virtual-search'  / 'virtual.csv')
         df_pred_virtual = df_virtual
         df_pred_virtual[t_task.get()] = pred_virtual
 
         #print(df_pred_virtual)
         df_pred_virtual =df_pred_virtual.dropna()
-        df_pred_virtual.to_csv(parent_path / 'results' /  theme_name / 'chainer' / 'virtual-search' /  'virtual.csv')
+        df_pred_virtual.to_csv(parent_path / 'results' /  theme_name / 'virtual-search' /  'virtual.csv')
 
-        png_list = (parent_path / 'results' /  theme_name / 'chainer' / 'virtual-search'  / 'molecular-structure').glob('*.png')
+        png_list = (parent_path / 'results' /  theme_name / 'virtual-search'  / 'molecular-structure').glob('*.png')
 
         #print(len(df_pred_virtual[t_task.get()]))
         for i, png_path in enumerate(png_list):
@@ -519,7 +504,7 @@ def make_virtual_lib():
     print('The ratio of error : ', error_cnt / virtual_libraly_num)
 
     for i, mol in enumerate(virtual_mols):
-        Draw.MolToFile(mol, str(parent_path / 'results' /  theme_name / 'chainer' / 'virtual-search'  / 'molecular-structure' / ('tmp-' + str(i) + '.png')))
+        Draw.MolToFile(mol, str(parent_path / 'results' /  theme_name / 'virtual-search'  / 'molecular-structure' / ('tmp-' + str(i) + '.png')))
 
 
     virtual_list = []
@@ -531,7 +516,7 @@ def make_virtual_lib():
                               columns=[t_id.get(), t_smiles.get(), t_task.get()])
 
     #print(df_virtual)
-    df_virtual.to_csv(parent_path / 'results' /  theme_name / 'chainer' / 'virtual-search'  / 'virtual.csv')
+    df_virtual.to_csv(parent_path / 'results' /  theme_name / 'virtual-search'  / 'virtual.csv')
 
 
 
@@ -748,17 +733,18 @@ def fit_by_mordred():
 
 
 def training_and_searching():
-    for method_name in method_list:
-        theme_name = t_theme_name.get() + '-' + method_name
-        chk_mkdir(theme_name)
+    for method_name in training_method:
 
         train_by_chainer_chemistry = Booleanvar_chainer_chemistry.get()
 
         print('fit by chainer')
 
-        fit_by_chainer_chemistry()
+        theme_name = t_theme_name.get() + '-' + method_name
+        chk_mkdir(theme_name)
+
+        fit_by_chainer_chemistry(method_name)
         make_virtual_lib()
-        predict_by_chainer_chemistry()
+        predict_by_chainer_chemistry(method_name)
 
         print('finish ' , t_theme_name.get())
 
@@ -809,21 +795,14 @@ t_epochs.set(50)
 label_epochs = tkinter.ttk.Label(frame1, text = '学習回数:')
 entry_epochs = ttk.Entry(frame1, textvariable=t_epochs, width = 60)
 
-Booleanvar_mordred = tkinter.BooleanVar()
-Booleanvar_deepchem = tkinter.BooleanVar()
 Booleanvar_chainer_chemistry = tkinter.BooleanVar()
 Booleanvar_transfer_learning = tkinter.BooleanVar()
 
-Booleanvar_mordred.set(False)
-Booleanvar_deepchem.set(False)
 Booleanvar_chainer_chemistry.set(True)
 Booleanvar_transfer_learning.set(True)
 
-#Checkbutton_mordred = tkinter.Checkbutton(frame1, text = 'mordred', variable = Booleanvar_mordred)
-#Checkbutton_deepchem = tkinter.Checkbutton(frame1, text = 'deepchem', variable = Booleanvar_deepchem)
 Checkbutton_chainer_chemistry = tkinter.Checkbutton(frame1, text = 'chainer-chemistry', variable = Booleanvar_chainer_chemistry)
 Checkbutton_transfer_learning = tkinter.Checkbutton(frame1, text = '転移学習', variable = Booleanvar_transfer_learning)
-
 
 button_fit = ttk.Button(frame1, text = '訓練開始', command = training_and_searching, style = 'my.TButton')
 
