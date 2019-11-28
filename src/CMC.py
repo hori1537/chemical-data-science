@@ -85,7 +85,7 @@ print('finich the importing')
 method_name = 'nfp'
 #['nfp', 'ggnn', 'schnet', 'weavenet', 'rsgcn', 'relgcn','relgat', 'mpnn', 'gnnfilm']
 epochs=50
-virtual_libraly_num = 10
+virtual_libraly_num = 500
 
 # paths
 current_path = Path.cwd()
@@ -365,7 +365,7 @@ def fit_by_chainer_chemistry():
 
 
         from PIL import Image
-        plt.figure(figsize=(5,5))
+        p_sct = plt.figure(figsize=(5,5))
         plt.scatter(y_train, pred_train, label = 'Train', c = 'blue')
         plt.title(args.label)
         plt.xlabel('Measured value')
@@ -375,7 +375,7 @@ def fit_by_chainer_chemistry():
         plt.legend(loc = 4)
 
         plt.savefig(parent_path / 'results' / theme_name / 'chainer' / 'scatter.png')
-        plt.close()
+        #plt.close(p_sct)
 
         global image_score
         image_score_open = Image.open(parent_path / 'results' / theme_name / 'chainer' / 'scatter.png')
@@ -777,8 +777,14 @@ def fit_data():
     elif train_by_chainer_chemistry == True:
         print('fit by chainer')
         fit_by_chainer_chemistry()
+        import time
+        start = time.time()
         make_virtual_lib()
+        m_  =  time.time() - start
         predict_by_chainer_chemistry()
+        p_  =  time.time() - start
+        print ("make virtual libraly:{0}".format(m_) + "[sec]")
+        print ("predict virtual libraly:{0}".format(p_) + "[sec]")
         print('finish ' , t_theme_name.get())
 
         return
