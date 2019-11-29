@@ -34,7 +34,7 @@ from sklearn import model_selection
 import sascorer # need fpscores.pkl.gz, sascorer.py
 
 import matplotlib.pyplot as plt
-from PIL import ImageTk, Image, ImageDraw
+from PIL import ImageTk, Image, ImageDraw, ImageFont
 
 # chemical
 from rdkit import rdBase, Chem
@@ -44,6 +44,8 @@ from rdkit.Chem.Draw import IPythonConsole
 from rdkit.Chem.Draw import rdMolDraw2D
 
 import pubchempy as pcp
+
+import sascorer
 #from mordred import descriptors, Calculator
 
 print('importing chainer - wait a minute')
@@ -73,20 +75,24 @@ from chainer_chemistry.models.prediction import GraphConvPredictor  # NOQA
 from chainer_chemistry.utils import run_train
 from chainer_chemistry.utils import save_json
 
-print('finish the importing')
+print('finish importing the libraries')
 
 ################################################################################
 # refer https://horomary.hatenablog.com/entry/2018/10/21/122025
 # refer https://www.ag.kagawa-u.ac.jp/charlesy/2017/07/27/deepchem%E3%81%AB%E3%82%88%E3%82%8B%E6%BA%B6%E8%A7%A3%E5%BA%A6%E4%BA%88%E6%B8%AC-graph-convolution-%E3%83%8B%E3%83%A5%E3%83%BC%E3%83%A9%E3%83%AB%E3%83%8D%E3%83%83%E3%83%88%E3%83%AF%E3%83%BC%E3%82%AF/
 # refer https://future-chem.com/rdkit-intro/
-
 ################################################################################
+
 # default setting of chainer chemistry
-training_method = ['nfp', 'weavenet', 'mpnn']
-training_method = ['schnet']
+training_method = ['nfp', 'weavenet', 'rsgcn']
+training_method = ['nfp']
+#training_method = ['relgat']
 #You can choose from ['nfp', 'ggnn', 'schnet', 'weavenet', 'rsgcn', 'relgcn','relgat', 'mpnn', 'gnnfilm']
-default_epochs=5
-virtual_libraly_num = 5
+# Low  complexity model : nfp, weavenet, mpnn
+# High complexity model : schnet, relgat,
+
+default_epochs=1200
+virtual_libraly_num = 200
 default_transfer_source = 'Lipophilicity'
 
 # paths
@@ -102,7 +108,7 @@ models_path = parent_path / 'models'
 def chk_mkdir(theme_name, method_name):
     paths =[parent_path / 'results' / theme_name / method_name / 'predict',
             parent_path / 'results' / theme_name / method_name / 'search',
-            parent_path / 'results' / theme_name / method_name / 'virtual-search'  / 'molecular-structure',
+            parent_path / 'results' / theme_name / method_name / 'brics_virtual'  / 'molecular-structure',
             parent_path / 'models'  / theme_name / method_name
             ]
 
@@ -370,7 +376,6 @@ def fit_by_chainer_chemistry(method_name):
         print('train_r2score : ', train_r2score)
         print('test_r2score : ', test_r2score)
 
-        from PIL import Image
         p_sct = plt.figure(figsize=(5,5))
         plt.scatter(y_train, pred_train, label = 'Train', c = 'blue')
         plt.title(args.label)
@@ -391,11 +396,17 @@ def fit_by_chainer_chemistry(method_name):
 
     main()
 
-def predict_by_chainer_chemistry(method_name, csv_path):
+def predict_by_chainer_chemistry(method_name, csv_path, data_name):
     def main():
         # Parse the arguments.
         args = parse_arguments()
         theme_name = t_theme_name.get()
+
+        args.model_folder_name = os.path.join(theme_name , 'chainer')
+        args.epoch = int(float(t_epochs.get()))
+        args.out = parent_path / 'models' / theme_name / method_name
+        args.method = method_name
+
 
         if args.label:
             labels = args.label
@@ -412,7 +423,7 @@ def predict_by_chainer_chemistry(method_name, csv_path):
         parser = CSVFileParser(preprocessor, postprocess_label=postprocess_label,
                                labels=labels, smiles_col=t_smiles.get())
 
-        #args.datafile=parent_path / 'results' /  theme_name / method_name / 'virtual-search'  / 'virtual.csv'
+        #args.datafile=parent_path / 'results' /  theme_name / method_name / 'brics_virtual'  / 'virtual.csv'
         args.datafile=csv_path
         dataset = parser.parse(args.datafile)['dataset']
 
@@ -436,31 +447,36 @@ def predict_by_chainer_chemistry(method_name, csv_path):
                                 device=device)()
         print('Evaluation result: ', eval_result)
 
-        pred_virtual = regressor.predict(virtualset, converter=extract_inputs)
-        pred_virtual = [i[0] for i in pred_virtual]
-        df_virtual = pd.read_csv(parent_path / 'results' /  theme_name / method_name / 'virtual-search'  / 'virtual.csv')
-        df_pred_virtual = df_virtual
-        df_pred_virtual[t_task.get()] = pred_virtual
+        predict_ = regressor.predict(dataset, converter=extract_inputs)
+        predict_ = [i[0] for i in predict_]
+        df_data = pd.read_csv(csv_path)
 
-        #print(df_pred_virtual)
-        df_pred_virtual =df_pred_virtual.dropna()
-        df_pred_virtual.to_csv(parent_path / 'results' /  theme_name / method_name / 'virtual-search' /  'virtual.csv')
+        df_predict = df_data
+        df_predict[t_task.get()] = predict_
+        df_predict =df_predict.dropna()
 
-        png_list = (parent_path / 'results' /  theme_name / method_name / 'virtual-search'  / 'molecular-structure').glob('*.png')
+        PandasTools.AddMoleculeColumnToFrame(frame=df_predict, smilesCol=t_smiles.get())
+        df_predict['sascore'] = df_predict.ROMol.map(sascorer.calculateScore)
 
-        #print(len(df_pred_virtual[t_task.get()]))
-        for i, png_path in enumerate(png_list):
-            if i < len(df_pred_virtual[t_task.get()]):
-                #print('i', i )
-                #print(str(round(df_pred_virtual[t_task.get()][i],2)))
+        df_predict.to_csv(csv_path)
+
+        png_generator = (parent_path / 'results' /  theme_name / method_name / data_name / 'molecular-structure').glob('*.png')
+        #png_generator.sort()
+
+        for i, png_path in enumerate(png_generator):
+            #print((png_path.name)[4:10])
+            i = int((png_path.name)[4:10])
+            if i < len(df_predict[t_task.get()]):
                 img = Image.open(png_path)
-                draw = ImageDraw.Draw(img)# im上のImageDrawインスタンスを作る
-                draw.text((0,0), t_task.get() + ' : ' + str(round(df_pred_virtual[t_task.get()][i],2)),  (0,0,0))
+                draw = ImageDraw.Draw(img)
+                font = ImageFont.truetype('arial.ttf', 26)
+                draw.text((0,0), t_task.get() + ' : ' + str(round(df_predict[t_task.get()][i],2)),  (0,0,0), font=font)
+                draw.text((0,30),  'sascore : ' + str(round(df_predict['sascore'][i],2)),  (0,0,0), font=font)
+
                 img.save(png_path)
 
-        save_json(os.path.join(args.out, theme_name, method_name,  'eval_result.json'), eval_result)
+        save_json(os.path.join(args.out,'eval_result.json'), eval_result)
     main()
-
 
 def make_virtual_lib(method_name):
     theme_name = t_theme_name.get()
@@ -514,7 +530,7 @@ def make_virtual_lib(method_name):
     print('The ratio of error : ', error_cnt / virtual_libraly_num)
 
     for i, mol in enumerate(virtual_mols):
-        Draw.MolToFile(mol, str(parent_path / 'results' /  theme_name / method_name / 'virtual-search'  / 'molecular-structure' / ('tmp-' + str(i) + '.png')))
+        Draw.MolToFile(mol, str(parent_path / 'results' /  theme_name / method_name / 'brics_virtual'  / 'molecular-structure' / ('tmp-' + str(i).zfill(6) + '.png')))
 
 
     virtual_list = []
@@ -526,7 +542,7 @@ def make_virtual_lib(method_name):
                               columns=[t_id.get(), t_smiles.get(), t_task.get()])
 
     #print(df_virtual)
-    csv_path =parent_path / 'results' /  theme_name / method_name / 'virtual-search'  / 'virtual.csv'
+    csv_path =parent_path / 'results' /  theme_name / method_name / 'brics_virtual'  / 'virtual.csv'
     df_virtual.to_csv(csv_path)
     return csv_path
 
@@ -561,7 +577,6 @@ def fit_by_deepchem():
     random.seed(1)
 
     model.fit(dataset, nb_epoch=max(1, int(t_epochs.get())))
-    #model.fit(trainset, nb_epoch=max(1, int(t_epochs.get())))
 
     metric = dc.metrics.Metric(dc.metrics.r2_score)
 
@@ -578,9 +593,6 @@ def fit_by_deepchem():
     y_train = np.array(trainset.y, dtype = np.float32)
     y_test = np.array(testset.y, dtype = np.float32)
 
-
-    plt.figure()
-
     plt.figure(figsize=(5,5))
 
     plt.scatter(y_train, pred_train, label = 'Train', c = 'blue')
@@ -589,11 +601,9 @@ def fit_by_deepchem():
     plt.ylabel('Predicted value')
     plt.scatter(y_test, pred_test, c = 'lightgreen', label = 'Test', alpha = 0.8)
     plt.legend(loc = 4)
-    #plt.show()
     plt.savefig('score-tmp.png')
 
     img = Image.open('score-tmp.png')
-
     img_resize = img.resize((400, 400), Image.LANCZOS)
     img_resize.save('score-tmp.png')
 
@@ -754,7 +764,7 @@ def training_and_searching():
         virtual_csv_path = make_virtual_lib(method_name)
 
         print('start predict the virtual library')
-        predict_by_chainer_chemistry(method_name, virtual_csv_path)
+        predict_by_chainer_chemistry(method_name, virtual_csv_path, 'brics_virtual')
 
         print('finish ' , t_theme_name.get())
     return
@@ -866,9 +876,6 @@ button_change_transfersource.grid(row=10,column=1,sticky=W)
 entry_model_name.grid(row=10, column=2, sticky=W)
 
 button_fit.grid(row=11,column=1,sticky=W)
-
-
-
 
 label_train_r2.grid(row=12,column=1,sticky=E)
 entry_train_r2.grid(row=12,column=2,sticky=W)
