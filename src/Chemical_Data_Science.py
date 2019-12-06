@@ -65,7 +65,39 @@ from chainer_chemistry.dataset.preprocessors import preprocess_method_dict
 
 from chainer_chemistry.links.scaler.standard_scaler import StandardScaler
 from chainer_chemistry.models import Regressor
+
 from chainer_chemistry.models import MLP, NFP
+from chainer_chemistry.models import ggnn  # NOQA
+from chainer_chemistry.models import gin  # NOQA
+from chainer_chemistry.models import gwm  # NOQA
+from chainer_chemistry.models import mlp  # NOQA
+from chainer_chemistry.models import mpnn  # NOQA
+from chainer_chemistry.models import nfp  # NOQA
+from chainer_chemistry.models import prediction  # NOQA
+from chainer_chemistry.models import relgat  # NOQA
+from chainer_chemistry.models import relgcn  # NOQA
+from chainer_chemistry.models import rsgcn  # NOQA
+from chainer_chemistry.models import schnet  # NOQA
+from chainer_chemistry.models import weavenet  # NOQA
+
+from chainer_chemistry.models.ggnn import GGNN  # NOQA
+from chainer_chemistry.models.ggnn import SparseGGNN  # NOQA
+from chainer_chemistry.models.gin import GIN  # NOQA
+from chainer_chemistry.models.mlp import MLP  # NOQA
+from chainer_chemistry.models.mpnn import MPNN  # NOQA
+from chainer_chemistry.models.nfp import NFP  # NOQA
+from chainer_chemistry.models.relgat import RelGAT  # NOQA
+from chainer_chemistry.models.relgcn import RelGCN  # NOQA
+from chainer_chemistry.models.rsgcn import RSGCN  # NOQA
+from chainer_chemistry.models.schnet import SchNet  # NOQA
+from chainer_chemistry.models.weavenet import WeaveNet  # NOQA
+from chainer_chemistry.models.gnn_film import GNNFiLM  # NOQA
+
+from chainer_chemistry.models.gwm.gwm_net import GGNN_GWM  # NOQA
+from chainer_chemistry.models.gwm.gwm_net import GIN_GWM  # NOQA
+from chainer_chemistry.models.gwm.gwm_net import NFP_GWM  # NOQA
+from chainer_chemistry.models.gwm.gwm_net import RSGCN_GWM  # NOQA
+
 from chainer_chemistry.models.prediction import set_up_predictor
 from chainer_chemistry.training.extensions.auto_print_report import AutoPrintReport
 from chainer.training.extensions import Evaluator
@@ -84,14 +116,20 @@ print('finish importing the libraries')
 ################################################################################
 
 # default setting of chainer chemistry
-training_method = ['nfp', 'weavenet', 'rsgcn']
-training_method = ['nfp']
-#training_method = ['relgat']
-#You can choose from ['nfp', 'ggnn', 'schnet', 'weavenet', 'rsgcn', 'relgcn','relgat', 'mpnn', 'gnnfilm']
+training_method = ['nfp', 'weavenet', 'rsgcn', 'mpnn']
+training_method = ['ggnn']
+training_method = ['nfp', 'ggnn', 'schnet', 'weavenet', 'rsgcn', 'relgcn','relgat']
+#You can choose from ['nfp', 'ggnn', 'schnet', 'weavenet', 'rsgcn', 'relgcn','relgat', 'mpnn']
 # Low  complexity model : nfp, weavenet, mpnn
 # High complexity model : schnet, relgat,
+# Complexity indication
+method_complexity = {'nfp':0.3, 'ggnn':0.4, 'schnet':11, 'weavenet':0.1,
+                     'rsgcn':0.1, 'relgcn':2,'relgat':1.5}
 
-default_epochs=1200
+complexity_degree = {'high':45, 'middle':15, 'low':5}
+
+
+default_epochs=30
 virtual_libraly_num = 200
 default_transfer_source = 'Lipophilicity'
 
@@ -105,11 +143,12 @@ data_path           = parent_path / 'data'
 data_processed_path = data_path / 'processed'
 models_path = parent_path / 'models'
 
-def chk_mkdir(theme_name, method_name):
-    paths =[parent_path / 'results' / theme_name / method_name / 'predict',
-            parent_path / 'results' / theme_name / method_name / 'search',
-            parent_path / 'results' / theme_name / method_name / 'brics_virtual'  / 'molecular-structure',
-            parent_path / 'models'  / theme_name / method_name
+def chk_mkdir(theme_name, method_name, high_low):
+
+    paths =[parent_path / 'results' / theme_name / method_name / high_low / 'predict',
+            parent_path / 'results' / theme_name / method_name / high_low / 'search',
+            parent_path / 'results' / theme_name / method_name / high_low / 'brics_virtual'  / 'molecular-structure',
+            parent_path / 'models'  / theme_name / method_name / high_low
             ]
 
     for path_name in paths:
@@ -165,8 +204,7 @@ def apply_molfromsmiles(smiles_name):
 
 def parse_arguments():
     # Lists of supported preprocessing methods/models.
-    method_list = ['nfp', 'ggnn', 'schnet', 'weavenet', 'rsgcn', 'relgcn',
-                   'relgat', 'mpnn', 'gnnfilm']
+    method_list = ['nfp', 'ggnn', 'schnet', 'weavenet', 'rsgcn', 'relgcn', 'relgat', 'mpnn', 'gnnfilm']
     scale_list = ['standardize', 'none']
 
     # Set up the argument parser.
@@ -229,15 +267,33 @@ def parse_arguments():
 def rmse(x0, x1):
     return functions.sqrt(functions.mean_squared_error(x0, x1))
 
-def fit_by_chainer_chemistry(method_name):
+
+def save_scatter(Y_train, pred_train, Y_test, pred_test, title, save_path):
+    plt_sct = plt.figure(figsize=(5,5))
+
+    plt.xlabel('Measured value')
+    plt.ylabel('Predicted value')
+    plt.title(title)
+    plt.scatter(Y_train, pred_train, label = 'Train', c = 'blue')
+    plt.scatter(Y_test, pred_test, c = 'lightgreen', label = 'Test', alpha = 0.8)
+    plt.legend(loc = 4)
+    plt.savefig(save_path)
+    #plt.close(plt_sct)
+
+
+
+def fit_by_chainer_chemistry(theme_name, method_name, high_low):
 
     def main():
         # Parse the arguments.
         args = parse_arguments()
+        high_low = var_epoch.get()
 
-        theme_name = t_theme_name.get()
         args.model_folder_name = os.path.join(theme_name , 'chainer')
-        args.epoch = int(float(t_epochs.get()))
+        epoch_high_low = complexity_degree[high_low]
+        args.epoch = int(epoch_high_low * 60 / method_complexity[method_name])
+
+        #args.epoch = int(float(t_epochs.get()))
         args.out = parent_path / 'models' / theme_name / method_name
         args.method = method_name
 
@@ -278,16 +334,16 @@ def fit_by_chainer_chemistry(method_name):
         train_data_size = int(len(dataset) * args.train_data_ratio)
         trainset, testset = split_dataset_random(dataset, train_data_size, args.seed)
 
-        print((args.source_transferlearning / method_name / 'regressor.pickle' ))
-        print((args.source_transferlearning / method_name / 'regressor.pickle' ).exists())
+        print((args.source_transferlearning / method_name / high_low /'regressor.pickle' ))
+        print((args.source_transferlearning / method_name / high_low /'regressor.pickle' ).exists())
 
         # Set up the predictor.
 
         if  Booleanvar_transfer_learning.get() == True  \
-              and (args.source_transferlearning / method_name / 'regressor.pickle').exists() == True:
+              and (args.source_transferlearning / method_name / high_low /'regressor.pickle').exists() == True:
 
             # refer https://github.com/pfnet-research/chainer-chemistry/issues/407
-            with open(args.source_transferlearning / method_name / 'regressor.pickle',  'rb') as f:
+            with open(args.source_transferlearning / method_name / high_low /'regressor.pickle',  'rb') as f:
                 regressor = cloudpickle.loads(f.read())
                 pre_predictor = regressor.predictor
                 predictor = GraphConvPredictor(pre_predictor.graph_conv, MLP(out_dim=1, hidden_dim=16))
@@ -324,10 +380,10 @@ def fit_by_chainer_chemistry(method_name):
             regressor.predictor.graph_conv.reset_state()
 
 
-        with open(parent_path / 'models' / theme_name / method_name /  ('regressor.pickle'),  'wb') as f:
+        with open(parent_path / 'models' / theme_name / method_name / high_low / ('regressor.pickle'),  'wb') as f:
             cloudpickle.dump(regressor, f)
 
-        #with open(parent_path / 'models' / theme_name / method_name / ('predictor.pickle'),  'wb') as f:
+        #with open(parent_path / 'models' / theme_name / method_name / high_low /('predictor.pickle'),  'wb') as f:
         #    cloudpickle.dump(predictor, f)
 
 
@@ -350,6 +406,16 @@ def fit_by_chainer_chemistry(method_name):
 
         y_train = [i[2][0] for i in trainset]
         y_test = [i[2][0] for i in testset]
+        title = args.label
+        save_path = parent_path / 'results' / theme_name / method_name / high_low /'scatter.png'
+        save_scatter(y_train, pred_train, y_test, pred_test, title ,save_path)
+
+        global image_score
+        image_score_open = Image.open(parent_path / 'results' / theme_name / method_name / high_low /'scatter.png')
+        image_score = ImageTk.PhotoImage(image_score_open, master=frame1)
+
+        canvas.create_image(200,200, image=image_score)
+
 
         from sklearn.metrics import mean_squared_error, mean_absolute_error
         from sklearn.metrics import r2_score
@@ -376,23 +442,7 @@ def fit_by_chainer_chemistry(method_name):
         print('train_r2score : ', train_r2score)
         print('test_r2score : ', test_r2score)
 
-        p_sct = plt.figure(figsize=(5,5))
-        plt.scatter(y_train, pred_train, label = 'Train', c = 'blue')
-        plt.title(args.label)
-        plt.xlabel('Measured value')
-        plt.ylabel('Predicted value')
 
-        plt.scatter(y_test, pred_test, c = 'lightgreen', label = 'Test', alpha = 0.8)
-        plt.legend(loc = 4)
-
-        plt.savefig(parent_path / 'results' / theme_name / method_name / 'scatter.png')
-        #plt.close(p_sct)
-
-        global image_score
-        image_score_open = Image.open(parent_path / 'results' / theme_name / method_name / 'scatter.png')
-        image_score = ImageTk.PhotoImage(image_score_open, master=frame1)
-
-        canvas.create_image(200,200, image=image_score)
 
     main()
 
@@ -403,7 +453,7 @@ def predict_by_chainer_chemistry(method_name, csv_path, data_name):
         theme_name = t_theme_name.get()
 
         args.model_folder_name = os.path.join(theme_name , 'chainer')
-        args.epoch = int(float(t_epochs.get()))
+        #args.epoch = int(float(t_epochs.get()))
         args.out = parent_path / 'models' / theme_name / method_name
         args.method = method_name
 
@@ -423,7 +473,7 @@ def predict_by_chainer_chemistry(method_name, csv_path, data_name):
         parser = CSVFileParser(preprocessor, postprocess_label=postprocess_label,
                                labels=labels, smiles_col=t_smiles.get())
 
-        #args.datafile=parent_path / 'results' /  theme_name / method_name / 'brics_virtual'  / 'virtual.csv'
+        #args.datafile=parent_path / 'results' /  theme_name / method_name / high_low /'brics_virtual'  / 'virtual.csv'
         args.datafile=csv_path
         dataset = parser.parse(args.datafile)['dataset']
 
@@ -436,7 +486,7 @@ def predict_by_chainer_chemistry(method_name, csv_path, data_name):
         device = chainer.get_device(args.device)
         model_path = os.path.join(args.out, args.model_foldername, args.model_filename)
 
-        with open(parent_path / 'models' / theme_name / method_name / ('regressor.pickle'), 'rb') as f:
+        with open(parent_path / 'models' / theme_name / method_name / high_low /('regressor.pickle'), 'rb') as f:
             regressor = cloudpickle.loads(f.read())
 
         # Perform the prediction.
@@ -460,7 +510,7 @@ def predict_by_chainer_chemistry(method_name, csv_path, data_name):
 
         df_predict.to_csv(csv_path)
 
-        png_generator = (parent_path / 'results' /  theme_name / method_name / data_name / 'molecular-structure').glob('*.png')
+        png_generator = (parent_path / 'results' /  theme_name / method_name / high_low /data_name / 'molecular-structure').glob('*.png')
         #png_generator.sort()
 
         for i, png_path in enumerate(png_generator):
@@ -530,7 +580,7 @@ def make_virtual_lib(method_name):
     print('The ratio of error : ', error_cnt / virtual_libraly_num)
 
     for i, mol in enumerate(virtual_mols):
-        Draw.MolToFile(mol, str(parent_path / 'results' /  theme_name / method_name / 'brics_virtual'  / 'molecular-structure' / ('tmp-' + str(i).zfill(6) + '.png')))
+        Draw.MolToFile(mol, str(parent_path / 'results' /  theme_name / method_name / high_low /'brics_virtual'  / 'molecular-structure' / ('tmp-' + str(i).zfill(6) + '.png')))
 
 
     virtual_list = []
@@ -542,7 +592,7 @@ def make_virtual_lib(method_name):
                               columns=[t_id.get(), t_smiles.get(), t_task.get()])
 
     #print(df_virtual)
-    csv_path =parent_path / 'results' /  theme_name / method_name / 'brics_virtual'  / 'virtual.csv'
+    csv_path =parent_path / 'results' /  theme_name / method_name / high_low /'brics_virtual'  / 'virtual.csv'
     df_virtual.to_csv(csv_path)
     return csv_path
 
@@ -576,11 +626,11 @@ def fit_by_deepchem():
     np.random.seed(1)
     random.seed(1)
 
-    model.fit(dataset, nb_epoch=max(1, int(t_epochs.get())))
+    model.fit(dataset, nb_epoch=max(1, int(100)))
 
     metric = dc.metrics.Metric(dc.metrics.r2_score)
 
-    print('epoch: ', t_epochs.get() )
+    print('epoch: ', 100 )
     print("Evaluating model")
     train_score = model.evaluate(trainset, [metric])
     test_score  = model.evaluate(testset, [metric])
@@ -702,7 +752,7 @@ def fit_by_mordred():
     model.compile(loss = 'mean_squared_error',
     optimizer = 'Adam',
     metrics=['accuracy'])
-    history = model.fit(X_train, y_train, epochs = max(5, int(t_epochs.get())), batch_size = 32,
+    history = model.fit(X_train, y_train, epochs = max(5, int(100)), batch_size = 32,
     validation_data = (X_test, y_test))
     score = model.evaluate(X_test, y_test, verbose = 0)
     print('Test loss:', score[0])
@@ -742,10 +792,10 @@ def fit_by_mordred():
     #plt.show()
 
     #plt.savefig(parent_path_str + os.sep + 'models' + os.sep + theme_name + os.sep + 'mordred_model' + os.sep  + 'score-tmp.png')
-    plt.savefig(parent_path / 'results' / theme_name / method_name / 'moredred' / 'scatter.png')
+    plt.savefig(parent_path / 'results' / theme_name / method_name / high_low /'moredred' / 'scatter.png')
 
     global image_score
-    image_score_open = Image.open(os.path.join(parent_path / 'results' / theme_name / method_name / 'moredred' / 'scatter.png'))
+    image_score_open = Image.open(os.path.join(parent_path / 'results' / theme_name / method_name / high_low /'moredred' / 'scatter.png'))
     image_score = ImageTk.PhotoImage(image_score_open, master=frame1)
     canvas.create_image(200,200, image=image_score)
 
@@ -755,16 +805,18 @@ def training_and_searching():
         train_by_chainer_chemistry = Booleanvar_chainer_chemistry.get()
         print('fit by chainer')
 
+        high_low = str(var_epoch.get())
         theme_name = t_theme_name.get()
-        chk_mkdir(theme_name, method_name)
 
-        fit_by_chainer_chemistry(method_name)
+        chk_mkdir(theme_name,  method_name, high_low)
+
+        fit_by_chainer_chemistry(theme_name, method_name, high_low)
 
         print('start making virtual library')
-        virtual_csv_path = make_virtual_lib(method_name)
+        #virtual_csv_path = make_virtual_lib(method_name)
 
         print('start predict the virtual library')
-        predict_by_chainer_chemistry(method_name, virtual_csv_path, 'brics_virtual')
+        #predict_by_chainer_chemistry(method_name, virtual_csv_path, 'brics_virtual')
 
         print('finish ' , t_theme_name.get())
     return
@@ -790,7 +842,7 @@ label_csv  = tkinter.ttk.Label(frame1, text = 'csv file path:')
 t_csv_filepath = tkinter.StringVar()
 t_csv_filename = tkinter.StringVar()
 
-entry_csv  = ttk.Entry(frame1, textvariable=t_csv_filename, width = 60)
+entry_csv  = ttk.Entry(frame1, textvariable=t_csv_filename, width = 15)
 
 button_getcsv = ttk.Button(frame1, text='CSVデータの選択', command = get_csv, style = 'my.TButton')
 
@@ -804,20 +856,28 @@ t_smiles = tkinter.StringVar()
 t_id = tkinter.StringVar()
 t_theme_name = tkinter.StringVar()
 
-entry_task = ttk.Entry(frame1, textvariable=t_task, width = 60)
-entry_smiles = ttk.Entry(frame1, textvariable=t_smiles, width = 60)
-entry_id = ttk.Entry(frame1, textvariable=t_id, width = 60)
-entry_themename = ttk.Entry(frame1, textvariable=t_theme_name, width = 60)
+entry_task = ttk.Entry(frame1, textvariable=t_task, width = 15)
+entry_smiles = ttk.Entry(frame1, textvariable=t_smiles, width = 15)
+entry_id = ttk.Entry(frame1, textvariable=t_id, width = 15)
+entry_themename = ttk.Entry(frame1, textvariable=t_theme_name, width = 15)
 
 t_epochs = tkinter.StringVar()
 t_epochs.set(default_epochs)
 label_epochs = tkinter.ttk.Label(frame1, text = '学習回数:')
-entry_epochs = ttk.Entry(frame1, textvariable=t_epochs, width = 60)
+#entry_epochs = ttk.Entry(frame1, textvariable=t_epochs, width = 60)
+
+var_epoch = tkinter.StringVar()
+var_epoch.set('low')
+
+Radiobutton_bayesian_max = tkinter.Radiobutton(frame1, value = 'high',   text = 'とことん', variable = var_epoch)
+Radiobutton_bayesian_avg = tkinter.Radiobutton(frame1, value = 'middle', text = '普通', variable = var_epoch)
+Radiobutton_bayesian_min = tkinter.Radiobutton(frame1, value = 'low',    text = '軽く', variable = var_epoch)
+
 
 Booleanvar_chainer_chemistry = tkinter.BooleanVar()
 Booleanvar_transfer_learning = tkinter.BooleanVar()
 Booleanvar_chainer_chemistry.set(True)
-Booleanvar_transfer_learning.set(True)
+Booleanvar_transfer_learning.set(False)
 
 Checkbutton_chainer_chemistry = tkinter.Checkbutton(frame1, text = 'chainer-chemistry', variable = Booleanvar_chainer_chemistry)
 Checkbutton_transfer_learning = tkinter.Checkbutton(frame1, text = '転移学習', variable = Booleanvar_transfer_learning)
@@ -827,17 +887,17 @@ t_model_path = tkinter.StringVar()
 
 t_model_name.set(default_transfer_source)
 
-entry_model_name = ttk.Entry(frame1, textvariable = t_model_name, width =60)
+entry_model_name = ttk.Entry(frame1, textvariable = t_model_name, width =15)
 button_change_transfersource = ttk.Button(frame1, text = '転移学習　元モデル変更', command = select_folder, style = 'my.TButton')
 button_fit = ttk.Button(frame1, text = '訓練開始', command = training_and_searching, style = 'my.TButton')
 
 label_train_r2 = tkinter.ttk.Label(frame1, text = '訓練用データのR2 score:')
 t_train_r2 = tkinter.StringVar()
-entry_train_r2 = ttk.Entry(frame1, textvariable=t_train_r2, width = 60)
+entry_train_r2 = ttk.Entry(frame1, textvariable=t_train_r2, width = 15)
 
 label_test_r2 = tkinter.ttk.Label(frame1, text = 'テスト用データのR2 score:')
 t_test_r2 = tkinter.StringVar()
-entry_test_r2 = ttk.Entry(frame1, textvariable=t_test_r2, width = 60)
+entry_test_r2 = ttk.Entry(frame1, textvariable=t_test_r2, width = 15)
 
 '''
 label_train_rmse = tkinter.ttk.Label(frame1, text = '訓練用データのRMSE score:')
@@ -865,7 +925,12 @@ entry_task.grid(row=4,column=2,sticky=W)
 entry_smiles.grid(row=5,column=2,sticky=W)
 entry_id.grid(row=6,column=2,sticky=W)
 entry_themename.grid(row=7,column=2,sticky=W)
-entry_epochs.grid(row=8,column=2,sticky=W)
+#entry_epochs.grid(row=8,column=2,sticky=W)
+
+Radiobutton_bayesian_max.grid(row=8,column=2,sticky=W)
+Radiobutton_bayesian_avg.grid(row=8,column=3,sticky=W)
+Radiobutton_bayesian_min.grid(row=8,column=4,sticky=W)
+
 
 #Checkbutton_mordred.grid(           row=9, column=2,sticky=W)
 #Checkbutton_deepchem.grid(          row=9,column=3,sticky=W)
