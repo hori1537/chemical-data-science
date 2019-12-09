@@ -126,7 +126,7 @@ training_method = ['nfp', 'ggnn', 'schnet', 'weavenet', 'rsgcn', 'relgcn','relga
 method_complexity = {'nfp':0.3, 'ggnn':0.4, 'schnet':11, 'weavenet':0.1,
                      'rsgcn':0.1, 'relgcn':2,'relgat':1.5}
 
-complexity_degree = {'high':45, 'middle':15, 'low':5}
+complexity_degree = {'high':30, 'middle':10, 'low':1}
 
 
 default_epochs=30
@@ -287,11 +287,12 @@ def fit_by_chainer_chemistry(theme_name, method_name, high_low):
     def main():
         # Parse the arguments.
         args = parse_arguments()
-        high_low = var_epoch.get()
 
         args.model_folder_name = os.path.join(theme_name , 'chainer')
-        epoch_high_low = complexity_degree[high_low]
+
+
         args.epoch = int(epoch_high_low * 60 / method_complexity[method_name])
+        args.epoch = max(args.epoch, 5)
 
         #args.epoch = int(float(t_epochs.get()))
         args.out = parent_path / 'models' / theme_name / method_name
