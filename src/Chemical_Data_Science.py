@@ -290,12 +290,12 @@ def fit_by_chainer_chemistry(theme_name, method_name, high_low):
 
         args.model_folder_name = os.path.join(theme_name , 'chainer')
 
-
-        args.epoch = int(epoch_high_low * 60 / method_complexity[method_name])
+        base_epoch = complexity_degree[high_low]
+        args.epoch = int(base_epoch * 60 / method_complexity[method_name])
         args.epoch = max(args.epoch, 5)
 
         #args.epoch = int(float(t_epochs.get()))
-        args.out = parent_path / 'models' / theme_name / method_name
+        args.out = parent_path / 'models' / theme_name / method_name / high_low
         args.method = method_name
 
         if t_model_path != "":
