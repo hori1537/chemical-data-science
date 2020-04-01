@@ -10,3 +10,7 @@ pubchempy
 ipython
 pillow
 matplotlib
+cloudpickle
+chainer
+argparse
+chainer-chemistry
