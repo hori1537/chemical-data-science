@@ -116,9 +116,9 @@ print('finish importing the libraries')
 ################################################################################
 
 # default setting of chainer chemistry
-training_method = ['nfp', 'weavenet', 'rsgcn', 'mpnn']
-training_method = ['ggnn']
-training_method = ['nfp', 'ggnn', 'schnet', 'weavenet', 'rsgcn', 'relgcn','relgat']
+#training_method = ['nfp', 'weavenet', 'rsgcn', 'mpnn']
+training_method = ['nfp']
+#training_method = ['nfp', 'ggnn', 'schnet', 'weavenet', 'rsgcn', 'relgcn','relgat']
 #You can choose from ['nfp', 'ggnn', 'schnet', 'weavenet', 'rsgcn', 'relgcn','relgat', 'mpnn']
 # Low  complexity model : nfp, weavenet, mpnn
 # High complexity model : schnet, relgat,
@@ -126,7 +126,7 @@ training_method = ['nfp', 'ggnn', 'schnet', 'weavenet', 'rsgcn', 'relgcn','relga
 method_complexity = {'nfp':0.3, 'ggnn':0.4, 'schnet':11, 'weavenet':0.1,
                      'rsgcn':0.1, 'relgcn':2,'relgat':1.5}
 
-complexity_degree = {'high':30, 'middle':10, 'low':1}
+complexity_degree = {'high':30, 'middle':10, 'low':0.1}
 
 
 default_epochs=30
@@ -814,10 +814,10 @@ def training_and_searching():
         fit_by_chainer_chemistry(theme_name, method_name, high_low)
 
         print('start making virtual library')
-        #virtual_csv_path = make_virtual_lib(method_name)
+        #virtual_csv_path = make_virtual_lib(method_name)                               #使いたかったら外す
 
         print('start predict the virtual library')
-        #predict_by_chainer_chemistry(method_name, virtual_csv_path, 'brics_virtual')
+        #predict_by_chainer_chemistry(method_name, virtual_csv_path, 'brics_virtual')   #使いたかったら外す
 
         print('finish ' , t_theme_name.get())
     return
